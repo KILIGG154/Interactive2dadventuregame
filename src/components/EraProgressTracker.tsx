@@ -55,7 +55,7 @@ export function EraProgressTracker({
   };
 
   return (
-    <div className="fixed right-8 top-[110px] z-30 w-80">{/* Di chuyển lên 3cm (≈110px) từ vị trí trước */}
+    <div className="absolute right-8 top-[114px] z-30 w-80">{/* top-[114px] = 1cm + 2cm = 3cm cách header */}
       <motion.div 
         className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border-4"
         style={{ 

@@ -18,6 +18,7 @@ function App() {
   const [selectedEra, setSelectedEra] = useState<string>('Lý - Trần'); // Start with first era
   const [monkPosition, setMonkPosition] = useState({ x: 15, y: 75 });
   const [isMonkMoving, setIsMonkMoving] = useState(false);
+  const [isCelebrating, setIsCelebrating] = useState(false);
   const [progress, setProgress] = useState<PlayerProgress>({
     currentCheckpoint: 'cp-1',
     completedCheckpoints: [],
@@ -78,6 +79,13 @@ function App() {
     });
 
     const currentIndex = checkpoints.findIndex((cp) => cp.id === selectedCheckpoint.id);
+    
+    // Check if this is the last checkpoint of the current era
+    const currentEra = eraRegions.find(
+      (region) => currentIndex >= region.startCheckpoint && currentIndex <= region.endCheckpoint
+    );
+    const isLastCheckpointOfEra = currentEra && currentIndex === currentEra.endCheckpoint;
+    
     if (currentIndex < checkpoints.length - 1) {
       updatedCheckpoints[currentIndex + 1].status = 'active';
       
@@ -108,6 +116,14 @@ function App() {
       level: newLevel,
       achievements: newAchievements,
     });
+
+    // Celebrate if completed an era
+    if (isLastCheckpointOfEra) {
+      setIsCelebrating(true);
+      setTimeout(() => {
+        setIsCelebrating(false);
+      }, 3000);
+    }
 
     setSelectedCheckpoint(null);
   };
@@ -189,23 +205,22 @@ function App() {
         <Flame className="size-6" />
       </motion.button>
 
-      {/* Era Progress Tracker */}
-      <EraProgressTracker
-        eras={eraRegions}
-        selectedEra={selectedEra}
-        completedCheckpoints={progress.completedCheckpoints}
-        allCheckpoints={checkpoints}
-        onEraSelect={handleEraSelect}
-        score={progress.score}
-        level={progress.level}
-        achievements={progress.achievements}
-      />
-
       {/* Main Content */}
-      <div className="flex-1 relative overflow-hidden" style={{ marginRight: '360px' }}>
+      <div className="flex-1 relative pt-[76px]">{/* Container có thể scroll */}
+        {/* Era Progress Tracker - Nằm bên phải, scroll cùng */}
+        <EraProgressTracker
+          eras={eraRegions}
+          selectedEra={selectedEra}
+          completedCheckpoints={progress.completedCheckpoints}
+          allCheckpoints={checkpoints}
+          onEraSelect={handleEraSelect}
+          score={progress.score}
+          level={progress.level}
+          achievements={progress.achievements}
+        />
+        
         {/* Vintage Map Area */}
-        <div className="relative">
-          {/* Vintage paper background */}
+        <div className="relative pr-[360px]">{/* Padding right để tránh đè lên sidebar */}
           <div 
             className="absolute inset-0" 
             style={{
@@ -351,8 +366,9 @@ function App() {
                     d={pathD}
                     fill="none"
                     stroke={isActive ? pathColor : '#E5D4C1'}
-                    strokeWidth="0.5"
-                    strokeDasharray="4 2"
+                    strokeWidth="1.2"
+                    strokeDasharray="12 6"
+                    strokeLinecap="round"
                     initial={{ pathLength: 0 }}
                     animate={{ pathLength: isActive ? 1 : 0 }}
                     transition={{ duration: 1.5, delay: index * 0.2 }}
@@ -378,7 +394,7 @@ function App() {
               <MonkCharacter
                 x={monkPosition.x - 8}
                 y={monkPosition.y}
-                emotion={isMonkMoving ? 'walking' : 'idle'}
+                emotion={isCelebrating ? 'happy' : (isMonkMoving ? 'walking' : 'idle')}
                 size="small"
               />
             </div>

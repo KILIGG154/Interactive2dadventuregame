@@ -543,8 +543,8 @@
     top: calc(var(--spacing) * 52);
   }
 
-  .top-\[110px\] {
-    top: 110px;
+  .top-\[114px\] {
+    top: 114px;
   }
 
   .-right-2 {
@@ -1452,6 +1452,14 @@
 
   .pt-0 {
     padding-top: calc(var(--spacing) * 0);
+  }
+
+  .pt-\[76px\] {
+    padding-top: 76px;
+  }
+
+  .pr-\[360px\] {
+    padding-right: 360px;
   }
 
   .text-center {
