@@ -1,0 +1,347 @@
+import { Checkpoint } from '../types/game';
+
+// Unified map - all checkpoints in zigzag pattern
+export const unifiedMapCheckpoints: Checkpoint[] = [
+  // ===== LÝ - TRẦN Dynasty (Zigzag from left to right) =====
+  {
+    id: 'cp-1',
+    title: 'Chùa Diên Hựu',
+    description: 'Khởi đầu hành trình',
+    x: 20,
+    y: 70,
+    status: 'active',
+    icon: 'lotus',
+    era: 'ly-tran',
+    question: {
+      title: 'Sự khởi nguồn của Phật giáo Việt Nam',
+      question: 'Chùa nào được xem là ngôi chùa đầu tiên ở Việt Nam?',
+      options: [
+        'Chùa Một Cột',
+        'Chùa Diên Hựu',
+        'Chùa Trấn Quốc',
+        'Chùa Bút Tháp'
+      ],
+      correctAnswer: 1,
+      hint: '💡 Gợi ý: Chùa này còn có tên là Chùa Dâu, nằm ở Bắc Ninh, được xây dựng từ thế kỷ thứ 6.',
+      explanation: 'Chùa Diên Hựu (Dâu) ở Bắc Ninh được xem là ngôi chùa cổ nhất Việt Nam, được xây dựng từ thời Lý Nam Đế (544-548).',
+      historicalFigure: 'Lý Thánh Tông',
+    },
+  },
+  {
+    id: 'cp-2',
+    title: 'Chùa Một Cột',
+    description: 'Kiến trúc độc đáo',
+    x: 30,
+    y: 50,
+    status: 'locked',
+    icon: 'bell',
+    era: 'ly-tran',
+    question: {
+      title: 'Chùa Một Cột',
+      question: 'Chùa Một Cột được xây dựng dưới triều đại nào?',
+      options: [
+        'Lý Thái Tổ',
+        'Lý Thánh Tông',
+        'Lý Thái Tông',
+        'Lý Nhân Tông'
+      ],
+      correctAnswer: 2,
+      hint: '💡 Gợi ý: Chùa được xây dựng năm 1049, dưới thời vị vua thứ 3 của nhà Lý.',
+      explanation: 'Chùa Một Cột được xây dựng năm 1049 dưới thời Lý Thái Tông, với kiến trúc độc đáo hình hoa sen nở trên mặt nước.',
+    },
+  },
+  {
+    id: 'cp-3',
+    title: 'Thiền sư Vạn Hạnh',
+    description: 'Quốc sư đời Lý',
+    x: 40,
+    y: 68,
+    status: 'locked',
+    icon: 'sutra',
+    era: 'ly-tran',
+    question: {
+      title: 'Thiền sư Vạn Hạnh',
+      question: 'Thiền sư Vạn Hạnh nổi tiếng với triết lý nào?',
+      options: [
+        'Thiền tông Trúc Lâm',
+        'Tứ đại giai không',
+        'Nhất hạnh tam muội',
+        'Thiền Lâm Tế'
+      ],
+      correctAnswer: 1,
+      explanation: 'Thiền sư Vạn Hạnh nổi tiếng với triết lý "Tứ đại giai không" - vạn vật đều vô thường.',
+    },
+  },
+  {
+    id: 'cp-4',
+    title: 'Trần Nhân Tông',
+    description: 'Vua tổ thiền Trúc Lâm',
+    x: 50,
+    y: 48,
+    status: 'locked',
+    icon: 'lotus',
+    era: 'ly-tran',
+    question: {
+      title: 'Thiền phái Trúc Lâm - Trần Nhân Tông',
+      question: 'Trần Nhân Tông sáng lập thiền phái nào?',
+      options: [
+        'Thiền Lâm Tế',
+        'Thiền Tào Động',
+        'Thiền Trúc Lâm',
+        'Thiền Vô Ngôn Thông'
+      ],
+      correctAnswer: 2,
+      explanation: 'Trần Nhân Tông là vị vua duy nhất trong lịch sử Việt Nam xuất gia, sáng lập thiền phái Trúc Lâm Yên Tử.',
+      historicalFigure: 'Trần Nhân Tông',
+    },
+  },
+  {
+    id: 'cp-5',
+    title: 'Núi Yên Tử',
+    description: 'Thánh địa Phật giáo',
+    x: 60,
+    y: 70,
+    status: 'locked',
+    icon: 'bell',
+    era: 'ly-tran',
+    question: {
+      title: 'Yên Tử - Thánh địa Phật giáo',
+      question: 'Yên Tử nổi tiếng là nơi tu hành của vị vua nào?',
+      options: [
+        'Lý Thánh Tông',
+        'Trần Thái Tông',
+        'Trần Nhân Tông',
+        'Lê Thánh Tông'
+      ],
+      correctAnswer: 2,
+      explanation: 'Trần Nhân Tông xuất gia tu tại Yên Tử và sáng lập thiền phái Trúc Lâm tại đây.',
+    },
+  },
+  
+  // ===== TÂY SƠN Period (Zigzag continues) =====
+  {
+    id: 'cp-6',
+    title: 'Phật giáo dân gian',
+    description: 'Gắn liền đời sống',
+    x: 25,
+    y: 50,
+    status: 'locked',
+    icon: 'lotus',
+    era: 'tay-son',
+    question: {
+      title: 'Phật giáo thời Tây Sơn',
+      question: 'Đặc điểm nào là nổi bật của Phật giáo thời Tây Sơn?',
+      options: [
+        'Phật giáo cung đình phát triển mạnh',
+        'Phật giáo gắn liền với dân gian',
+        'Thiền phái mới xuất hiện',
+        'Phật giáo bị suy thoái'
+      ],
+      correctAnswer: 1,
+      explanation: 'Thời Tây Sơn, Phật giáo gắn bó mật thiết với đời sống dân gian, ít chịu ảnh hưởng triều đình.',
+    },
+  },
+  {
+    id: 'cp-7',
+    title: 'Chùa làng',
+    description: 'Trung tâm văn hóa',
+    x: 45,
+    y: 68,
+    status: 'locked',
+    icon: 'bell',
+    era: 'tay-son',
+    question: {
+      title: 'Vai trò chùa làng',
+      question: 'Chùa làng thời Tây Sơn có vai trò gì?',
+      options: [
+        'Chỉ là nơi thờ phượng',
+        'Trung tâm văn hóa và giáo dục',
+        'Nơi tập trung quân sự',
+        'Chỉ dành cho tu sĩ'
+      ],
+      correctAnswer: 1,
+      explanation: 'Chùa làng là trung tâm văn hóa, giáo dục và sinh hoạt cộng đồng của làng xã Việt Nam.',
+    },
+  },
+  
+  // ===== CẬN ĐẠI Period (Zigzag continues) =====
+  {
+    id: 'cp-8',
+    title: 'Chùa Thiên Mụ',
+    description: 'Biểu tượng cố đô Huế',
+    x: 30,
+    y: 50,
+    status: 'locked',
+    icon: 'sutra',
+    era: 'can-dai',
+    question: {
+      title: 'Chùa Thiên Mụ - Huế',
+      question: 'Chùa Thiên Mụ nổi tiếng với công trình nào?',
+      options: [
+        'Tháp Báo Thiên',
+        'Tháp Phước Duyên',
+        'Tháp Từ Nhân',
+        'Tháp Linh Mụ'
+      ],
+      correctAnswer: 1,
+      explanation: 'Tháp Phước Duyên cao 21m với 7 tầng là biểu tượng của chùa Thiên Mụ và cố đô Huế.',
+    },
+  },
+  {
+    id: 'cp-9',
+    title: 'Phật giáo cải cách',
+    description: 'Phong trào canh tân',
+    x: 50,
+    y: 68,
+    status: 'locked',
+    icon: 'lotus',
+    era: 'can-dai',
+    question: {
+      title: 'Phong trào cải cách Phật giáo',
+      question: 'Ai là người khởi xướng phong trào cải cách Phật giáo đầu thế kỷ 20?',
+      options: [
+        'Thiền sư Thích Thanh Từ',
+        'Hòa thượng Thích Trí Quang',
+        'Cư sĩ Lê Đình Thám',
+        'Thiền sư Thích Nhất Hạnh'
+      ],
+      correctAnswer: 2,
+      explanation: 'Cư sĩ Lê Đình Thám là một trong những người khởi xướng phong trào cải cách Phật giáo Việt Nam đầu thế kỷ 20.',
+    },
+  },
+  {
+    id: 'cp-10',
+    title: 'Hội Phật giáo',
+    description: 'Tổ chức thống nhất',
+    x: 70,
+    y: 50,
+    status: 'locked',
+    icon: 'bell',
+    era: 'can-dai',
+    question: {
+      title: 'Giáo hội Phật giáo Việt Nam',
+      question: 'Giáo hội Phật giáo Việt Nam thống nhất được thành lập năm nào?',
+      options: [
+        '1945',
+        '1951',
+        '1958',
+        '1963'
+      ],
+      correctAnswer: 1,
+      explanation: 'Giáo hội Phật giáo Việt Nam thống nhất được thành lập năm 1951 tại Huế.',
+    },
+  },
+  
+  // ===== HIỆN ĐẠI Period (Final zigzag) =====
+  {
+    id: 'cp-11',
+    title: 'Thích Nhất Hạnh',
+    description: 'Thiền chánh niệm',
+    x: 30,
+    y: 68,
+    status: 'locked',
+    icon: 'lotus',
+    era: 'hien-dai',
+    question: {
+      title: 'Thiền sư Thích Nhất Hạnh',
+      question: 'Thiền sư Thích Nhất Hạnh nổi tiếng với dòng tu nào?',
+      options: [
+        'Dòng Thiền Tông',
+        'Dòng Làng Mai',
+        'Dòng Trúc Lâm',
+        'Dòng Liễu Quán'
+      ],
+      correctAnswer: 1,
+      explanation: 'Thiền sư Thích Nhất Hạnh sáng lập dòng tu Làng Mai (Plum Village) tại Pháp, phổ biến thiền chánh niệm ra toàn thế giới.',
+      historicalFigure: 'Thích Nhất Hạnh',
+    },
+  },
+  {
+    id: 'cp-12',
+    title: 'Phật giáo nhập thế',
+    description: 'Tham gia xã hội',
+    x: 50,
+    y: 50,
+    status: 'locked',
+    icon: 'sutra',
+    era: 'hien-dai',
+    question: {
+      title: 'Phật giáo nhập thế',
+      question: 'Phật giáo nhập thế là gì?',
+      options: [
+        'Phật giáo tham gia chính trị',
+        'Phật giáo phục vụ xã hội, cộng đồng',
+        'Phật giáo xuất gia',
+        'Phật giáo từ thiện'
+      ],
+      correctAnswer: 1,
+      explanation: 'Phật giáo nhập thế là xu hướng Phật giáo tham gia tích cực vào các hoạt động xã hội, từ thiện, giáo dục để phục vụ cộng đồng.',
+    },
+  },
+  {
+    id: 'cp-13',
+    title: 'Thiền viện hiện đại',
+    description: 'Không gian tu học',
+    x: 70,
+    y: 68,
+    status: 'locked',
+    icon: 'bell',
+    era: 'hien-dai',
+    question: {
+      title: 'Thiền viện đương đại',
+      question: 'Thiền viện Trúc Lâm nổi tiếng ở đâu?',
+      options: [
+        'Đà Lạt',
+        'Hà Nội',
+        'Huế',
+        'Sài Gòn'
+      ],
+      correctAnswer: 0,
+      explanation: 'Thiền viện Trúc Lâm Đà Lạt là một trong những thiền viện nổi tiếng nhất Việt Nam, nằm giữa khung cảnh thiên nhiên tuyệt đẹp.',
+    },
+  },
+];
+
+// Era regions with icons
+export const eraRegions = [
+  {
+    name: 'Lý - Trần',
+    period: 'TK 11-14',
+    color: '#4A7C59',
+    icon: '🏯', // Temple/Palace
+    startCheckpoint: 0,
+    endCheckpoint: 4,
+    x: 18,
+    y: 85,
+  },
+  {
+    name: 'Tây Sơn',
+    period: 'TK 18',
+    color: '#C4302B',
+    icon: '🏛️', // Village temple
+    startCheckpoint: 5,
+    endCheckpoint: 6,
+    x: 45,
+    y: 85,
+  },
+  {
+    name: 'Cận đại',
+    period: 'TK 19-20',
+    color: '#9370DB',
+    icon: '🕉️', // Buddhist symbol
+    startCheckpoint: 7,
+    endCheckpoint: 9,
+    x: 62,
+    y: 85,
+  },
+  {
+    name: 'Hiện đại',
+    period: 'TK 21',
+    color: '#4169E1',
+    icon: '🧘', // Meditation
+    startCheckpoint: 10,
+    endCheckpoint: 12,
+    x: 80,
+    y: 85,
+  },
+];
