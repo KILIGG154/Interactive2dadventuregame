@@ -26,6 +26,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       explanation: 'Chùa Diên Hựu (Dâu) ở Bắc Ninh được xem là ngôi chùa cổ nhất Việt Nam, được xây dựng từ thời Lý Nam Đế (544-548).',
       historicalFigure: 'Lý Thánh Tông',
     },
+    theory: {
+      title: 'Chùa Diên Hựu – Ngôi chùa cổ nhất Việt Nam',
+      content: 'Chùa Diên Hựu còn gọi là Chùa Dâu, tọa lạc tại Bắc Ninh. Đây được xem là ngôi chùa đầu tiên và cổ nhất ở Việt Nam, được xây dựng từ thời Lý Nam Đế (khoảng 544–548). Chùa gắn liền với sự hình thành và phát triển của Phật giáo Việt Nam thời kỳ đầu.',
+    },
   },
   {
     id: 'cp-2',
@@ -49,6 +53,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       hint: '💡 Gợi ý: Chùa được xây dựng năm 1049, dưới thời vị vua thứ 3 của nhà Lý.',
       explanation: 'Chùa Một Cột được xây dựng năm 1049 dưới thời Lý Thái Tông, với kiến trúc độc đáo hình hoa sen nở trên mặt nước.',
     },
+    theory: {
+      title: 'Chùa Một Cột – Kiến trúc một cột độc đáo',
+      content: 'Chùa Một Cột được xây dựng năm 1049, dưới triều vua Lý Thái Tông (vị vua thứ ba của nhà Lý). Chùa có kiến trúc rất đặc trưng: một cột đá giữa hồ, trên đỉnh là đài sen, tượng trưng cho hoa sen nở trên mặt nước. Đây là một trong những biểu tượng văn hóa Phật giáo và kiến trúc Việt Nam.',
+    },
   },
   {
     id: 'cp-3',
@@ -70,6 +78,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       ],
       correctAnswer: 1,
       explanation: 'Thiền sư Vạn Hạnh nổi tiếng với triết lý "Tứ đại giai không" - vạn vật đều vô thường.',
+    },
+    theory: {
+      title: 'Thiền sư Vạn Hạnh – Quốc sư đời Lý',
+      content: 'Thiền sư Vạn Hạnh (938–1018) là quốc sư dưới thời Lý. Ngài nổi tiếng với triết lý "Tứ đại giai không": bốn đại (đất, nước, lửa, gió) đều là không, vạn vật vô thường. Triết lý này ảnh hưởng sâu sắc đến Phật giáo và tư tưởng Việt Nam thời Lý.',
     },
   },
   {
@@ -94,6 +106,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       explanation: 'Trần Nhân Tông là vị vua duy nhất trong lịch sử Việt Nam xuất gia, sáng lập thiền phái Trúc Lâm Yên Tử.',
       historicalFigure: 'Trần Nhân Tông',
     },
+    theory: {
+      title: 'Trần Nhân Tông – Sáng lập thiền phái Trúc Lâm',
+      content: 'Trần Nhân Tông (1258–1308) là vị vua thứ ba nhà Trần. Sau khi truyền ngôi, ngài xuất gia và là vị vua duy nhất trong lịch sử Việt Nam đi tu. Ngài sáng lập thiền phái Trúc Lâm Yên Tử – thiền phái mang bản sắc Việt Nam, kết hợp Thiền – Tịnh – Mật.',
+    },
   },
   {
     id: 'cp-5',
@@ -115,6 +131,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       ],
       correctAnswer: 2,
       explanation: 'Trần Nhân Tông xuất gia tu tại Yên Tử và sáng lập thiền phái Trúc Lâm tại đây.',
+    },
+    theory: {
+      title: 'Yên Tử – Thánh địa Phật giáo Trúc Lâm',
+      content: 'Núi Yên Tử (Quảng Ninh) là nơi Trần Nhân Tông xuất gia tu hành và sáng lập thiền phái Trúc Lâm. Yên Tử được xem là thánh địa của Phật giáo Việt Nam, nơi hành hương và tu tập của nhiều thế hệ. Hệ thống chùa tháp trên Yên Tử gắn liền với Trúc Lâm tam tổ.',
     },
   },
   
@@ -140,6 +160,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       correctAnswer: 1,
       explanation: 'Thời Tây Sơn, Phật giáo gắn bó mật thiết với đời sống dân gian, ít chịu ảnh hưởng triều đình.',
     },
+    theory: {
+      title: 'Phật giáo thời Tây Sơn – Gắn với dân gian',
+      content: 'Trong thời kỳ Tây Sơn (thế kỷ 18), Phật giáo không phát triển mạnh ở cung đình như thời Lý – Trần, mà gắn bó chặt chẽ với đời sống làng xã. Phật giáo dân gian trở thành trụ cột tinh thần và văn hóa của người dân.',
+    },
   },
   {
     id: 'cp-7',
@@ -161,6 +185,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       ],
       correctAnswer: 1,
       explanation: 'Chùa làng là trung tâm văn hóa, giáo dục và sinh hoạt cộng đồng của làng xã Việt Nam.',
+    },
+    theory: {
+      title: 'Chùa làng – Trung tâm văn hóa và giáo dục',
+      content: 'Chùa làng ở Việt Nam không chỉ là nơi thờ Phật mà còn là trung tâm văn hóa, giáo dục và sinh hoạt cộng đồng. Tại đây diễn ra lễ hội, học chữ, và các hoạt động từ thiện. Chùa làng đóng vai trò quan trọng trong việc gắn kết và giáo dục người dân.',
     },
   },
   
@@ -186,6 +214,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       correctAnswer: 1,
       explanation: 'Tháp Phước Duyên cao 21m với 7 tầng là biểu tượng của chùa Thiên Mụ và cố đô Huế.',
     },
+    theory: {
+      title: 'Chùa Thiên Mụ – Biểu tượng cố đô Huế',
+      content: 'Chùa Thiên Mụ (Huế) nổi tiếng với Tháp Phước Duyên – tháp bát giác cao 21 mét, 7 tầng, mỗi tầng thờ một vị Phật. Tháp là biểu tượng của chùa và của cố đô Huế. Chùa được xây dựng từ đầu thế kỷ 17 và là một trong những ngôi chùa đẹp nhất Việt Nam.',
+    },
   },
   {
     id: 'cp-9',
@@ -208,6 +240,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       correctAnswer: 2,
       explanation: 'Cư sĩ Lê Đình Thám là một trong những người khởi xướng phong trào cải cách Phật giáo Việt Nam đầu thế kỷ 20.',
     },
+    theory: {
+      title: 'Phong trào cải cách Phật giáo – Cư sĩ Lê Đình Thám',
+      content: 'Đầu thế kỷ 20, Phật giáo Việt Nam có phong trào chấn hưng và cải cách. Cư sĩ Lê Đình Thám là một trong những người tiên phong: vận động thành lập hội Phật học, mở trường, in kinh và đưa Phật giáo gắn với giáo dục, xã hội hiện đại.',
+    },
   },
   {
     id: 'cp-10',
@@ -229,6 +265,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       ],
       correctAnswer: 1,
       explanation: 'Giáo hội Phật giáo Việt Nam thống nhất được thành lập năm 1951 tại Huế.',
+    },
+    theory: {
+      title: 'Giáo hội Phật giáo Việt Nam thống nhất',
+      content: 'Giáo hội Phật giáo Việt Nam thống nhất được thành lập năm 1951 tại Huế, quy tụ các tổ chức Phật giáo Bắc – Trung – Nam. Sự ra đời này đánh dấu bước thống nhất Phật giáo Việt Nam trong thời cận hiện đại.',
     },
   },
   
@@ -255,6 +295,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       explanation: 'Thiền sư Thích Nhất Hạnh sáng lập dòng tu Làng Mai (Plum Village) tại Pháp, phổ biến thiền chánh niệm ra toàn thế giới.',
       historicalFigure: 'Thích Nhất Hạnh',
     },
+    theory: {
+      title: 'Thiền sư Thích Nhất Hạnh – Dòng tu Làng Mai',
+      content: 'Thiền sư Thích Nhất Hạnh (1926–2022) là một trong những tu sĩ Phật giáo có ảnh hưởng nhất thế giới. Ngài sáng lập dòng tu Làng Mai (Plum Village) tại Pháp và phổ biến thiền chánh niệm (mindfulness) ra toàn cầu qua sách, khóa tu và hoạt động hòa bình.',
+    },
   },
   {
     id: 'cp-12',
@@ -277,6 +321,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       correctAnswer: 1,
       explanation: 'Phật giáo nhập thế là xu hướng Phật giáo tham gia tích cực vào các hoạt động xã hội, từ thiện, giáo dục để phục vụ cộng đồng.',
     },
+    theory: {
+      title: 'Phật giáo nhập thế – Phục vụ xã hội và cộng đồng',
+      content: 'Phật giáo nhập thế là xu hướng Phật giáo không chỉ tu trong chùa mà tham gia tích cực vào đời sống xã hội: từ thiện, giáo dục, y tế, bảo vệ môi trường và hòa bình. Mục đích là đem đạo vào đời, phục vụ cộng đồng và giảm bớt khổ đau trong xã hội.',
+    },
   },
   {
     id: 'cp-13',
@@ -298,6 +346,10 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       ],
       correctAnswer: 0,
       explanation: 'Thiền viện Trúc Lâm Đà Lạt là một trong những thiền viện nổi tiếng nhất Việt Nam, nằm giữa khung cảnh thiên nhiên tuyệt đẹp.',
+    },
+    theory: {
+      title: 'Thiền viện Trúc Lâm – Đà Lạt',
+      content: 'Thiền viện Trúc Lâm nổi tiếng nhất nằm ở Đà Lạt, giữa núi rừng và hồ Tuyền Lâm. Đây là thiền viện hiện đại theo phái Trúc Lâm, vừa là nơi tu tập vừa là điểm tham quan với kiến trúc hài hòa thiên nhiên.',
     },
   },
 ];

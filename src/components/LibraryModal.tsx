@@ -1,16 +1,21 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Users, Lightbulb, MapPin, Flame } from 'lucide-react';
+import { X, Users, Lightbulb, MapPin, Flame, BookOpen } from 'lucide-react';
 import { useState } from 'react';
+import { Checkpoint } from '../types/game';
+import { TheoryCard } from './TheoryCard';
+import { eraRegions } from '../data/unifiedMapData';
 
 interface LibraryModalProps {
   isOpen: boolean;
   onClose: () => void;
+  checkpoints: Checkpoint[];
 }
 
-type Tab = 'figures' | 'philosophy' | 'monuments';
+type Tab = 'figures' | 'philosophy' | 'monuments' | 'theory';
 
-export function LibraryModal({ isOpen, onClose }: LibraryModalProps) {
+export function LibraryModal({ isOpen, onClose, checkpoints }: LibraryModalProps) {
   const [activeTab, setActiveTab] = useState<Tab>('figures');
+  const [expandedTheoryId, setExpandedTheoryId] = useState<string | null>(null);
 
   const figures = [
     {
@@ -82,6 +87,7 @@ export function LibraryModal({ isOpen, onClose }: LibraryModalProps) {
     { id: 'figures' as Tab, label: 'Nhân vật', icon: Users },
     { id: 'philosophy' as Tab, label: 'Tư tưởng', icon: Lightbulb },
     { id: 'monuments' as Tab, label: 'Di tích', icon: MapPin },
+    { id: 'theory' as Tab, label: 'Lý thuyết', icon: BookOpen },
   ];
 
   return (
@@ -245,6 +251,65 @@ export function LibraryModal({ isOpen, onClose }: LibraryModalProps) {
                           <p className="text-xs text-gray-600 italic">{monument.period}</p>
                         </motion.div>
                       ))}
+                    </motion.div>
+                  )}
+
+                  {activeTab === 'theory' && (
+                    <motion.div
+                      key="theory"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      className="space-y-6"
+                    >
+                      {eraRegions.map((era, eraIndex) => {
+                        const eraCheckpoints = checkpoints.slice(
+                          era.startCheckpoint,
+                          era.endCheckpoint + 1
+                        ).filter((cp) => cp.theory);
+                        if (eraCheckpoints.length === 0) return null;
+                        return (
+                          <div key={era.name}>
+                            <h3
+                              className="text-lg font-bold text-amber-900 mb-3 flex items-center gap-2"
+                              style={{ color: era.color }}
+                            >
+                              <span>{era.icon}</span>
+                              {era.name} ({era.period})
+                            </h3>
+                            <div className="space-y-3">
+                              {eraCheckpoints.map((cp) => (
+                                <div key={cp.id}>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setExpandedTheoryId(expandedTheoryId === cp.id ? null : cp.id)
+                                    }
+                                    className="w-full text-left flex items-center justify-between gap-2 p-3 rounded-lg bg-white border-2 border-amber-200 hover:border-amber-400 transition-colors"
+                                  >
+                                    <span className="font-semibold text-amber-900">{cp.title}</span>
+                                    <span className="text-amber-600">
+                                      {expandedTheoryId === cp.id ? '▼ Thu gọn' : '▶ Đọc'}
+                                    </span>
+                                  </button>
+                                  <AnimatePresence>
+                                    {expandedTheoryId === cp.id && cp.theory && (
+                                      <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        className="mt-2 overflow-hidden"
+                                      >
+                                        <TheoryCard theory={cp.theory} />
+                                      </motion.div>
+                                    )}
+                                  </AnimatePresence>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </motion.div>
                   )}
                 </AnimatePresence>
