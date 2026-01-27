@@ -1,5 +1,10 @@
 export type CheckpointStatus = 'locked' | 'active' | 'completed';
 
+export interface Theory {
+  title: string;
+  content: string;
+}
+
 export interface Checkpoint {
   id: string;
   title: string;
@@ -10,6 +15,7 @@ export interface Checkpoint {
   icon: 'lotus' | 'bell' | 'sutra';
   question: Question;
   era: string;
+  theory?: Theory;
 }
 
 export interface Question {

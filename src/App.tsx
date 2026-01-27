@@ -426,11 +426,16 @@ function App() {
             isOpen={!!selectedCheckpoint}
             onClose={() => setSelectedCheckpoint(null)}
             onAnswer={handleAnswer}
+            theory={selectedCheckpoint.theory}
           />
         )}
       </AnimatePresence>
 
-      <LibraryModal isOpen={showLibrary} onClose={() => setShowLibrary(false)} />
+      <LibraryModal
+        isOpen={showLibrary}
+        onClose={() => setShowLibrary(false)}
+        checkpoints={checkpoints}
+      />
     </div>
   );
 }
