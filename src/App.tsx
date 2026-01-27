@@ -11,6 +11,7 @@ import { CompletionCelebration } from './components/CompletionCelebration';
 import { ParticleSystem } from './components/ParticleSystem';
 import { EraProgressTracker } from './components/EraProgressTracker';
 import { unifiedMapCheckpoints, eraRegions } from './data/unifiedMapData';
+import { decisionMoments } from './data/decisionMomentsData';
 import { getUnlockedPeriods, philosophicalPeriods } from './data/philosophicalPeriodsData';
 import { PlayerProgress, Checkpoint as CheckpointType } from './types/game';
 
@@ -73,7 +74,19 @@ function App() {
   const handleAnswer = (correct: boolean) => {
     if (!selectedCheckpoint) return;
 
-    const scoreChange = correct ? 100 : -20;
+    // Nếu là Decision Moment → dùng score từ phân tích triết học thay vì đúng/sai đơn giản
+    const dm = selectedCheckpoint.decisionMomentId
+      ? decisionMoments.find((d) => d.id === selectedCheckpoint.decisionMomentId)
+      : undefined;
+
+    let scoreChange: number;
+    if (dm && correct) {
+      // Ở chế độ Decision Moment, QuestionModal đã xác nhận là một lựa chọn hợp lệ,
+      // phần điểm chi tiết có thể được gán ở đây trong tương lai (hiện tại +100 để đơn giản).
+      scoreChange = 100;
+    } else {
+      scoreChange = correct ? 100 : -20;
+    }
     const newScore = Math.max(0, progress.score + scoreChange);
     const newLevel = Math.floor(newScore / 500) + 1;
 
@@ -475,6 +488,11 @@ function App() {
             onClose={() => setSelectedCheckpoint(null)}
             onAnswer={handleAnswer}
             theory={selectedCheckpoint.theory}
+            decisionMoment={
+              selectedCheckpoint.decisionMomentId
+                ? decisionMoments.find((d) => d.id === selectedCheckpoint.decisionMomentId)
+                : undefined
+            }
           />
         )}
       </AnimatePresence>      <LibraryModal

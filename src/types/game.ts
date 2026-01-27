@@ -16,6 +16,8 @@ export interface Checkpoint {
   question: Question;
   era: string;
   theory?: Theory;
+  // Gắn với Decision Moment (tuỳ chọn) để triển khai câu hỏi tình huống triết học
+  decisionMomentId?: string;
 }
 
 export interface Question {
@@ -72,4 +74,25 @@ export interface JourneyLibrary {
   periods: PhilosophicalPeriod[];
   totalProgress: number;
   unlockedPeriods: string[];
+}
+
+export interface DecisionOption {
+  id: string;
+  text: string;
+}
+
+export interface DecisionMoment {
+  id: string;
+  // Tình huống thực hành triết học (scenario) gắn với checkpoint/era
+  scenario: string;
+  options: DecisionOption[];
+  philosophicalAnalysis: {
+    [optionId: string]: {
+      // Mức độ phù hợp với tư tưởng/triết lý mục tiêu (ví dụ: Trúc Lâm)
+      fitLevel: 'high' | 'medium' | 'low';
+      explanation: string;
+      // Điểm partial credit (0–100) cho lựa chọn này
+      score: number;
+    };
+  };
 }

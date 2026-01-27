@@ -1,8 +1,12 @@
+import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Users, Lightbulb, MapPin, Flame, BookOpen, Calendar } from 'lucide-react';
+import { X, Users, Lightbulb, MapPin, Flame, BookOpen, Calendar, Scale, Sparkles, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Checkpoint } from '../types/game';
 import { TheoryCard } from './TheoryCard';
+import { PhilosophicalComparison } from './PhilosophicalComparison';
+import { FolkCultureSection } from './FolkCultureSection';
+import { PhilosophicalDialogue } from './PhilosophicalDialogue';
 import { eraRegions } from '../data/unifiedMapData';
 import { philosophicalPeriods, getUnlockedPeriods } from '../data/philosophicalPeriodsData';
 
@@ -12,7 +16,7 @@ interface LibraryModalProps {
   checkpoints: Checkpoint[];
 }
 
-type Tab = 'journey' | 'figures' | 'philosophy' | 'monuments' | 'theory';
+type Tab = 'journey' | 'figures' | 'philosophy' | 'monuments' | 'theory' | 'comparison' | 'folk-culture' | 'dialogue';
 
 export function LibraryModal({ isOpen, onClose, checkpoints }: LibraryModalProps) {
   const [activeTab, setActiveTab] = useState<Tab>('journey'); // Bắt đầu với tab Hành Trình
@@ -213,6 +217,9 @@ export function LibraryModal({ isOpen, onClose, checkpoints }: LibraryModalProps
     { id: 'philosophy' as Tab, label: 'Tư tưởng', icon: Lightbulb },
     { id: 'monuments' as Tab, label: 'Di tích', icon: MapPin },
     { id: 'theory' as Tab, label: 'Lý thuyết', icon: BookOpen },
+    { id: 'comparison' as Tab, label: 'So sánh', icon: Scale },
+    { id: 'folk-culture' as Tab, label: 'Văn hóa dân gian', icon: Sparkles },
+    { id: 'dialogue' as Tab, label: 'Tư tưởng đối thoại', icon: MessageCircle },
   ];
 
   return (
@@ -258,28 +265,52 @@ export function LibraryModal({ isOpen, onClose, checkpoints }: LibraryModalProps
                 </div>
 
                 {/* Tabs */}
-                <div className="flex gap-2 mt-6">
-                  {tabs.map((tab) => {
-                    const Icon = tab.icon;
-                    const isActive = activeTab === tab.id;
-                    
-                    return (
-                      <motion.button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${
-                          isActive
-                            ? 'bg-white text-amber-900 shadow-lg'
-                            : 'bg-white/20 text-white hover:bg-white/30'
-                        }`}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Icon className="size-5" />
-                        <span>{tab.label}</span>
-                      </motion.button>
-                    );
-                  })}
+                <div 
+                  className="mt-6 overflow-x-auto pb-2"
+                  style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#fbbf24 #fef3c7',
+                  }}
+                >
+                  <style>{`
+                    div[class*="overflow-x-auto"]::-webkit-scrollbar {
+                      height: 8px;
+                    }
+                    div[class*="overflow-x-auto"]::-webkit-scrollbar-track {
+                      background: #fef3c7;
+                      border-radius: 4px;
+                    }
+                    div[class*="overflow-x-auto"]::-webkit-scrollbar-thumb {
+                      background: #fbbf24;
+                      border-radius: 4px;
+                    }
+                    div[class*="overflow-x-auto"]::-webkit-scrollbar-thumb:hover {
+                      background: #f59e0b;
+                    }
+                  `}</style>
+                  <div className="flex flex-nowrap gap-2 min-w-max">
+                    {tabs.map((tab) => {
+                      const Icon = tab.icon;
+                      const isActive = activeTab === tab.id;
+                      
+                      return (
+                        <motion.button
+                          key={tab.id}
+                          onClick={() => setActiveTab(tab.id)}
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
+                            isActive
+                              ? 'bg-white text-amber-900 shadow-lg'
+                              : 'bg-white/20 text-white hover:bg-white/30'
+                          }`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <Icon className="size-4" />
+                          <span>{tab.label}</span>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>              {/* Content */}
               <div className="p-6 overflow-y-auto max-h-[calc(80vh-180px)]">
@@ -801,6 +832,37 @@ export function LibraryModal({ isOpen, onClose, checkpoints }: LibraryModalProps
                           </div>
                         );
                       })}
+                    </motion.div>
+                  )}
+
+                  {activeTab === 'comparison' && (
+                    <motion.div
+                      key="comparison"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                    >
+                      <PhilosophicalComparison />
+                    </motion.div>
+                  )}
+                  {activeTab === 'folk-culture' && (
+                    <motion.div
+                      key="folk-culture"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                    >
+                      <FolkCultureSection />
+                    </motion.div>
+                  )}
+                  {activeTab === 'dialogue' && (
+                    <motion.div
+                      key="dialogue"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                    >
+                      <PhilosophicalDialogue />
                     </motion.div>
                   )}
                 </AnimatePresence>

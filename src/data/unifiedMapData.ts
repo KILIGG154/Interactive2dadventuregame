@@ -110,6 +110,8 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
       title: 'Trần Nhân Tông – Sáng lập thiền phái Trúc Lâm',
       content: 'Trần Nhân Tông (1258–1308) là vị vua thứ ba nhà Trần. Sau khi truyền ngôi, ngài xuất gia và là vị vua duy nhất trong lịch sử Việt Nam đi tu. Ngài sáng lập thiền phái Trúc Lâm Yên Tử – thiền phái mang bản sắc Việt Nam, kết hợp Thiền – Tịnh – Mật.',
     },
+    // Gắn Decision Moment về lựa chọn hành động của thiền sư Trúc Lâm khi quốc gia loạn lạc
+    decisionMomentId: 'dm-truc-lam-quoc-gia-loan',
   },
   {
     id: 'cp-5',

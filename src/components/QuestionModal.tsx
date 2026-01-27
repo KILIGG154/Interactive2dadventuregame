@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Lightbulb, BookOpen, Flower2, Clock } from 'lucide-react';
-import { Question, Theory } from '../types/game';
+import { Question, Theory, DecisionMoment } from '../types/game';
 import { useState, useEffect, useRef } from 'react';
 import { MonkCharacter } from './MonkCharacter';
 import { TheoryCard } from './TheoryCard';
@@ -13,9 +13,18 @@ interface QuestionModalProps {
   onClose: () => void;
   onAnswer: (correct: boolean) => void;
   theory?: Theory;
+  // Nếu có DecisionMoment → chế độ câu hỏi tình huống, không đúng/sai tuyệt đối
+  decisionMoment?: DecisionMoment;
 }
 
-export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: QuestionModalProps) {
+export function QuestionModal({
+  question,
+  isOpen,
+  onClose,
+  onAnswer,
+  theory,
+  decisionMoment,
+}: QuestionModalProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -26,6 +35,7 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: Q
   const [timeUp, setTimeUp] = useState(false);
   const timeoutFiredRef = useRef(false);
   const timerPausedRef = useRef(false);
+  const [decisionScore, setDecisionScore] = useState<number | null>(null);
 
   // Countdown timer: 60s, pause when theory panel open or result shown; on 0 → onAnswer(false) once
   useEffect(() => {
@@ -34,6 +44,7 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: Q
     setTimeUp(false);
     timeoutFiredRef.current = false;
     timerPausedRef.current = false;
+    setDecisionScore(null);
   }, [isOpen, question.title]);
 
   useEffect(() => {
@@ -67,6 +78,32 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: Q
   const handleSubmit = () => {
     if (selectedAnswer === null) return;
 
+    // Chế độ Decision Moment: không có đúng/sai tuyệt đối, chỉ có mức độ phù hợp + điểm
+    if (decisionMoment) {
+      const option = decisionMoment.options[selectedAnswer];
+      const analysis = option ? decisionMoment.philosophicalAnalysis[option.id] : undefined;
+      if (!analysis) return;
+
+      setDecisionScore(analysis.score);
+      setShowResult(true);
+
+      if (analysis.score >= 80) {
+        setMonkEmotion('happy');
+      } else if (analysis.score >= 50) {
+        setMonkEmotion('idle');
+      } else {
+        setMonkEmotion('sad');
+      }
+
+      // Báo về App: coi như “trả lời đúng” để mở tiến trình, nhưng App sẽ dùng score để tính điểm
+      setTimeout(() => {
+        onAnswer(true);
+        handleClose();
+      }, 3000);
+      return;
+    }
+
+    // Chế độ câu hỏi trắc nghiệm thông thường
     const isCorrect = selectedAnswer === question.correctAnswer;
 
     if (isCorrect) {
@@ -111,6 +148,7 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: Q
     setShowTheoryPanel(false);
     setTimeUp(false);
     setSecondsLeft(TIMER_SECONDS);
+    setDecisionScore(null);
     onClose();
   };
 
@@ -281,7 +319,7 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: Q
                     )}
                   </div>
 
-                  {/* Question */}
+                  {/* Question / Scenario */}
                   <motion.div
                     className="bg-white/50 rounded-lg p-6 mb-6 border-2 border-amber-200"
                     initial={{ x: -20, opacity: 0 }}
@@ -289,17 +327,17 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: Q
                     transition={{ delay: 0.4 }}
                   >
                     <p className="text-lg text-gray-800 font-medium text-center">
-                      {question.question}
+                      {decisionMoment ? decisionMoment.scenario : question.question}
                     </p>
                   </motion.div>
 
                   {/* Options */}
                   <div className="space-y-3 mb-6">
-                    {question.options.map((option, index) => {
+                    {(decisionMoment ? decisionMoment.options.map((o) => o.text) : question.options).map((option, index) => {
                       const isSelected = selectedAnswer === index;
-                      const isCorrect = index === question.correctAnswer;
-                      const showCorrect = showResult && isCorrect;
-                      const showWrong = showResult && isSelected && !isCorrect;
+                      const isCorrect = !decisionMoment && index === question.correctAnswer;
+                      const showCorrect = showResult && isCorrect && !decisionMoment;
+                      const showWrong = showResult && isSelected && !isCorrect && !decisionMoment;
 
                       return (
                         <motion.button
@@ -372,7 +410,9 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: Q
                     {showResult && (
                       <motion.div
                         className={`border-2 rounded-lg p-4 mb-6 ${
-                          selectedAnswer === question.correctAnswer
+                          decisionMoment
+                            ? 'bg-blue-50 border-blue-300'
+                            : selectedAnswer === question.correctAnswer
                             ? 'bg-green-50 border-green-300'
                             : 'bg-orange-50 border-orange-300'
                         }`}
@@ -380,7 +420,46 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: Q
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                       >
-                        {selectedAnswer === question.correctAnswer ? (
+                        {decisionMoment && decisionScore !== null ? (
+                          <>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="bg-blue-500 rounded-full p-2">
+                                <BookOpen className="size-6 text-white" />
+                              </div>
+                              <span className="text-blue-900 font-bold text-lg">
+                                Phân tích lựa chọn của bạn
+                              </span>
+                            </div>
+                            {(() => {
+                              const option = decisionMoment.options[selectedAnswer!];
+                              const analysis = option
+                                ? decisionMoment.philosophicalAnalysis[option.id]
+                                : undefined;
+                              if (!analysis) return null;
+                              return (
+                                <>
+                                  <p className="text-sm text-blue-900 mb-2">
+                                    Độ phù hợp với tinh thần Trúc Lâm:{' '}
+                                    <span className="font-semibold uppercase">
+                                      {analysis.fitLevel === 'high'
+                                        ? 'Rất phù hợp'
+                                        : analysis.fitLevel === 'medium'
+                                        ? 'Khá phù hợp'
+                                        : 'Chưa phù hợp'}
+                                    </span>
+                                  </p>
+                                  <p className="text-sm text-blue-900 mb-2">
+                                    Điểm triết học (partial credit):{' '}
+                                    <span className="font-semibold">{analysis.score}/100</span>
+                                  </p>
+                                  <p className="text-sm text-blue-900 leading-relaxed">
+                                    {analysis.explanation}
+                                  </p>
+                                </>
+                              );
+                            })()}
+                          </>
+                        ) : selectedAnswer === question.correctAnswer ? (
                           <>
                             <motion.div
                               className="flex items-center gap-2 mb-2"
