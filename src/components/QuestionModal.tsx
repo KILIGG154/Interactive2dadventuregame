@@ -1,30 +1,75 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Lightbulb, BookOpen, Flower2 } from 'lucide-react';
-import { Question } from '../types/game';
-import { useState } from 'react';
+import { X, Lightbulb, BookOpen, Flower2, Clock } from 'lucide-react';
+import { Question, Theory } from '../types/game';
+import { useState, useEffect, useRef } from 'react';
 import { MonkCharacter } from './MonkCharacter';
+import { TheoryCard } from './TheoryCard';
+
+const TIMER_SECONDS = 60;
 
 interface QuestionModalProps {
   question: Question;
   isOpen: boolean;
   onClose: () => void;
   onAnswer: (correct: boolean) => void;
+  theory?: Theory;
 }
 
-export function QuestionModal({ question, isOpen, onClose, onAnswer }: QuestionModalProps) {
+export function QuestionModal({ question, isOpen, onClose, onAnswer, theory }: QuestionModalProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [monkEmotion, setMonkEmotion] = useState<'idle' | 'happy' | 'sad'>('idle');
-  const [wrongAttempts, setWrongAttempts] = useState(0); // Track số lần trả lời sai
+  const [wrongAttempts, setWrongAttempts] = useState(0);
+  const [secondsLeft, setSecondsLeft] = useState(TIMER_SECONDS);
+  const [showTheoryPanel, setShowTheoryPanel] = useState(false);
+  const [timeUp, setTimeUp] = useState(false);
+  const timeoutFiredRef = useRef(false);
+  const timerPausedRef = useRef(false);
+
+  // Countdown timer: 60s, pause when theory panel open or result shown; on 0 → onAnswer(false) once
+  useEffect(() => {
+    if (!isOpen) return;
+    setSecondsLeft(TIMER_SECONDS);
+    setTimeUp(false);
+    timeoutFiredRef.current = false;
+    timerPausedRef.current = false;
+  }, [isOpen, question.title]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const shouldTick = !showResult && !showTheoryPanel && !timeUp;
+    timerPausedRef.current = !shouldTick;
+    if (!shouldTick) return;
+
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          if (!timeoutFiredRef.current) {
+            timeoutFiredRef.current = true;
+            setTimeUp(true);
+            setShowResult(true);
+            setMonkEmotion('sad');
+            setTimeout(() => {
+              onAnswer(false);
+              onClose();
+            }, 2000);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isOpen, showResult, showTheoryPanel, timeUp]);
 
   const handleSubmit = () => {
     if (selectedAnswer === null) return;
-    
+
     const isCorrect = selectedAnswer === question.correctAnswer;
-    
+
     if (isCorrect) {
-      // Trả lời đúng
       setShowResult(true);
       setMonkEmotion('happy');
       setTimeout(() => {
@@ -32,28 +77,21 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer }: QuestionM
         handleClose();
       }, 2500);
     } else {
-      // Trả lời sai
-      setWrongAttempts(prev => prev + 1);
-      
+      setWrongAttempts((prev) => prev + 1);
+
       if (wrongAttempts === 0) {
-        // Lần sai đầu tiên - hiển thị gợi ý
         setShowResult(true);
         setMonkEmotion('sad');
         setShowHint(true);
-        
-        // Reset sau 3s để người chơi thử lại
         setTimeout(() => {
           setShowResult(false);
           setSelectedAnswer(null);
           setMonkEmotion('idle');
         }, 3000);
       } else {
-        // Lần sai thứ 2 - reset câu hỏi
         setShowResult(true);
         setMonkEmotion('sad');
-        
         setTimeout(() => {
-          // Reset hoàn toàn
           setWrongAttempts(0);
           setSelectedAnswer(null);
           setShowResult(false);
@@ -70,6 +108,9 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer }: QuestionM
     setShowHint(false);
     setMonkEmotion('idle');
     setWrongAttempts(0);
+    setShowTheoryPanel(false);
+    setTimeUp(false);
+    setSecondsLeft(TIMER_SECONDS);
     onClose();
   };
 
@@ -191,6 +232,19 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer }: QuestionM
                     <rect width="800" height="100" fill="url(#dragon-pattern)" opacity="0.3" />
                   </svg>
                   <div className="absolute inset-0 bg-gradient-to-b from-amber-100/50 to-transparent" />
+                </div>
+
+                {/* Timer */}
+                <div
+                  className={`absolute top-4 right-14 z-10 flex items-center gap-1.5 px-3 py-2 rounded-full font-mono font-bold ${
+                    secondsLeft <= 10 ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-900'
+                  }`}
+                >
+                  <Clock className="size-4" />
+                  <span>
+                    {Math.floor(secondsLeft / 60)}
+                    :{(secondsLeft % 60).toString().padStart(2, '0')}
+                  </span>
                 </div>
 
                 {/* Close button */}
@@ -371,6 +425,18 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer }: QuestionM
                               </div>
                             </motion.div>
                           </>
+                        ) : timeUp ? (
+                          <>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="bg-red-500 rounded-full p-2">
+                                <Clock className="size-6 text-white" />
+                              </div>
+                              <span className="text-red-800 font-bold text-lg">Hết thời gian!</span>
+                            </div>
+                            <p className="text-sm text-red-800">
+                              Bạn có thể bấm lại checkpoint để thử lại.
+                            </p>
+                          </>
                         ) : (
                           <>
                             <div className="flex items-center gap-2 mb-2">
@@ -388,19 +454,30 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer }: QuestionM
 
                   {/* Action buttons */}
                   {!showResult && (
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                       <motion.button
                         onClick={handleSubmit}
                         disabled={selectedAnswer === null}
-                        className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+                        className="flex-1 min-w-[120px] bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3 px-6 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
                         whileHover={{ scale: selectedAnswer !== null ? 1.02 : 1 }}
                         whileTap={{ scale: selectedAnswer !== null ? 0.98 : 1 }}
                       >
                         Xác nhận
                       </motion.button>
+                      {theory && (
+                        <motion.button
+                          onClick={() => setShowTheoryPanel(true)}
+                          className="px-4 py-3 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold rounded-lg transition-colors flex items-center gap-2"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <BookOpen className="size-5" />
+                          Đọc lý thuyết
+                        </motion.button>
+                      )}
                       <motion.button
                         onClick={() => setShowHint(!showHint)}
-                        className="px-6 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold rounded-lg transition-colors"
+                        className="px-4 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold rounded-lg transition-colors"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
@@ -408,11 +485,11 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer }: QuestionM
                       </motion.button>
                       <motion.button
                         onClick={handleClose}
-                        className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors"
+                        className="px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <BookOpen className="size-5" />
+                        Đóng
                       </motion.button>
                     </div>
                   )}
@@ -421,6 +498,50 @@ export function QuestionModal({ question, isOpen, onClose, onAnswer }: QuestionM
                 {/* Decorative bottom border */}
                 <div className="h-4 bg-gradient-to-r from-amber-700 via-red-800 to-amber-700" />
               </div>
+
+              {/* Theory panel overlay - timer pauses while open */}
+              <AnimatePresence>
+                {showTheoryPanel && theory && (
+                  <>
+                    <motion.div
+                      className="fixed inset-0 bg-black/50 z-[60]"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setShowTheoryPanel(false)}
+                    />
+                    <motion.div
+                      className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[70] p-4 w-[min(88vmin,400px)] aspect-square flex flex-col"
+                      initial={{ opacity: 0, scale: 0.96, y: 8 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.96, y: 8 }}
+                    >
+                      <div
+                        className="rounded-2xl shadow-2xl overflow-hidden border border-amber-200 flex flex-col flex-1 min-h-0"
+                        style={{
+                          background: 'linear-gradient(to bottom, #FFFBEB 0%, #FEF3C7 12%, #FFF 24%, #FFF 100%)',
+                          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(251,191,36,0.2)',
+                        }}
+                      >
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-amber-200/80 bg-amber-50/80 flex-shrink-0">
+                          <span className="text-xs font-medium uppercase tracking-wide text-amber-700/90">
+                            Đang tạm dừng đồng hồ
+                          </span>
+                          <button
+                            onClick={() => setShowTheoryPanel(false)}
+                            className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm shadow-sm transition-colors"
+                          >
+                            Đóng
+                          </button>
+                        </div>
+                        <div className="overflow-y-auto flex-1 min-h-0 p-4">
+                          <TheoryCard theory={theory} compact />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
 
               {/* Floating lotus petals around modal */}
               {showResult && selectedAnswer === question.correctAnswer && (

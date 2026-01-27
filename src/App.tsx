@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Flame } from 'lucide-react';
+import { Flame, BookOpen } from 'lucide-react';
 import { Checkpoint } from './components/Checkpoint';
 import { MonkCharacter } from './components/MonkCharacter';
 import { QuestionModal } from './components/QuestionModal';
 import { ProgressBar } from './components/ProgressBar';
 import { LibraryModal } from './components/LibraryModal';
+import { UnlockNotification } from './components/UnlockNotification';
+import { CompletionCelebration } from './components/CompletionCelebration';
 import { ParticleSystem } from './components/ParticleSystem';
 import { EraProgressTracker } from './components/EraProgressTracker';
 import { unifiedMapCheckpoints, eraRegions } from './data/unifiedMapData';
+import { getUnlockedPeriods, philosophicalPeriods } from './data/philosophicalPeriodsData';
 import { PlayerProgress, Checkpoint as CheckpointType } from './types/game';
 
 function App() {
@@ -18,14 +21,17 @@ function App() {
   const [selectedEra, setSelectedEra] = useState<string>('Lý - Trần'); // Start with first era
   const [monkPosition, setMonkPosition] = useState({ x: 15, y: 75 });
   const [isMonkMoving, setIsMonkMoving] = useState(false);
-  const [isCelebrating, setIsCelebrating] = useState(false);
-  const [progress, setProgress] = useState<PlayerProgress>({
+  const [isCelebrating, setIsCelebrating] = useState(false);  const [progress, setProgress] = useState<PlayerProgress>({
     currentCheckpoint: 'cp-1',
     completedCheckpoints: [],
     score: 0,
     level: 1,
     achievements: [],
   });
+  const [unlockNotification, setUnlockNotification] = useState<{
+    periodName: string;
+    isVisible: boolean;
+  }>({ periodName: '', isVisible: false });
 
   const handleCheckpointClick = (checkpoint: CheckpointType) => {
     console.log('Checkpoint clicked:', checkpoint);
@@ -93,10 +99,13 @@ function App() {
       moveMonkToCheckpoint(nextCheckpoint.x, nextCheckpoint.y);
     }
 
-    setCheckpoints(updatedCheckpoints);
-
-    const newCompletedCheckpoints = [...progress.completedCheckpoints, selectedCheckpoint.id];
+    setCheckpoints(updatedCheckpoints);    const newCompletedCheckpoints = [...progress.completedCheckpoints, selectedCheckpoint.id];
     const newAchievements = [...progress.achievements];
+
+    // Check for newly unlocked periods
+    const previousUnlocked = getUnlockedPeriods(progress.completedCheckpoints, checkpoints.length);
+    const newUnlocked = getUnlockedPeriods(newCompletedCheckpoints, checkpoints.length);
+    const newlyUnlocked = newUnlocked.filter(period => !previousUnlocked.includes(period));
 
     if (newCompletedCheckpoints.length === 1 && !newAchievements.includes('first-step')) {
       newAchievements.push('first-step');
@@ -104,9 +113,12 @@ function App() {
     if (newScore >= 500 && !newAchievements.includes('scholar')) {
       newAchievements.push('scholar');
     }
-
     if (newCompletedCheckpoints.length === checkpoints.length && !newAchievements.includes('enlightened')) {
       newAchievements.push('enlightened');
+      // Tự động mở thư viện hành trình khi hoàn thành tất cả
+      setTimeout(() => {
+        setShowLibrary(true);
+      }, 3000); // Đợi 3 giây sau khi hiển thị thông báo hoàn thành
     }
 
     setProgress({
@@ -115,14 +127,25 @@ function App() {
       score: newScore,
       level: newLevel,
       achievements: newAchievements,
-    });
-
-    // Celebrate if completed an era
+    });    // Celebrate if completed an era
     if (isLastCheckpointOfEra) {
       setIsCelebrating(true);
       setTimeout(() => {
         setIsCelebrating(false);
       }, 3000);
+    }
+
+    // Show notification for newly unlocked periods
+    if (newlyUnlocked.length > 0) {
+      const unlockedPeriod = philosophicalPeriods.find(p => p.id === newlyUnlocked[0]);
+      if (unlockedPeriod) {
+        setTimeout(() => {
+          setUnlockNotification({
+            periodName: unlockedPeriod.name,
+            isVisible: true
+          });
+        }, 1500); // Show after celebration ends
+      }
     }
 
     setSelectedCheckpoint(null);
@@ -185,12 +208,13 @@ function App() {
           completionPercentage={calculateCompletionPercentage()}
           currentEra={getCurrentEra()}
         />
-      </div>
+      </div>      {/* Completion Celebration */}
+      <CompletionCelebration isVisible={progress.completedCheckpoints.length === checkpoints.length} />
 
-      {/* Library Button */}
+      {/* Journey Library Button */}
       <motion.button
         onClick={() => setShowLibrary(true)}
-        className="fixed top-28 right-8 z-40 bg-gradient-to-br from-amber-600 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-amber-500/50 transition-all"
+        className="fixed top-28 right-8 z-40 bg-gradient-to-br from-amber-600 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-amber-500/50 transition-all group"
         whileHover={{ scale: 1.1, rotate: 10 }}
         whileTap={{ scale: 0.95 }}
         animate={{
@@ -200,9 +224,18 @@ function App() {
             '0 10px 30px rgba(251, 191, 36, 0.3)',
           ],
         }}
-        transition={{ duration: 2, repeat: Infinity }}
+        transition={{
+          boxShadow: { duration: 2, repeat: Infinity },
+        }}
       >
-        <Flame className="size-6" />
+        <BookOpen size={28} className="group-hover:rotate-12 transition-transform" />        <motion.div
+          className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 1, type: "spring" }}
+        >
+          {getUnlockedPeriods(progress.completedCheckpoints, checkpoints.length).length}
+        </motion.div>
       </motion.button>
 
       {/* Main Content */}
@@ -397,20 +430,35 @@ function App() {
                 emotion={isCelebrating ? 'happy' : (isMonkMoving ? 'walking' : 'idle')}
                 size="small"
               />
-            </div>
-
-            {/* Completion */}
+            </div>            {/* Completion */}
             {progress.completedCheckpoints.length === checkpoints.length && (
               <motion.div
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-                style={{ zIndex: 10 }}
+                style={{ zIndex: 20 }}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
               >
-                <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-12 py-8 rounded-3xl shadow-2xl border-4 border-white">
-                  <div className="text-6xl mb-4 text-center">✨</div>
-                  <h2 className="text-4xl font-bold mb-2 text-center">Gic Ngộ Viên Mãn!</h2>
-                  <p className="text-xl text-center">Tổng điểm: {progress.score}</p>
+                <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white px-12 py-8 rounded-3xl shadow-2xl border-4 border-white text-center">
+                  <div className="text-6xl mb-4">✨</div>
+                  <h2 className="text-4xl font-bold mb-4">Giác Ngộ Viên Mãn!</h2>
+                  <p className="text-xl mb-4">Tổng điểm: {progress.score}</p>
+                  <motion.div
+                    className="text-lg text-yellow-100 mb-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 2 }}
+                  >
+                    🏛️ Thư viện hành trình sẽ tự động mở sau 3 giây...
+                  </motion.div>
+                  <motion.button
+                    onClick={() => setShowLibrary(true)}
+                    className="bg-white text-orange-600 px-6 py-2 rounded-full font-bold hover:bg-orange-50 transition-colors"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.5 }}
+                  >
+                    Mở Thư Viện Ngay
+                  </motion.button>
                 </div>
               </motion.div>
             )}
@@ -426,11 +474,21 @@ function App() {
             isOpen={!!selectedCheckpoint}
             onClose={() => setSelectedCheckpoint(null)}
             onAnswer={handleAnswer}
+            theory={selectedCheckpoint.theory}
           />
         )}
-      </AnimatePresence>
+      </AnimatePresence>      <LibraryModal
+        isOpen={showLibrary}
+        onClose={() => setShowLibrary(false)}
+        checkpoints={checkpoints}
+      />
 
-      <LibraryModal isOpen={showLibrary} onClose={() => setShowLibrary(false)} />
+      {/* Unlock Notification */}
+      <UnlockNotification
+        periodName={unlockNotification.periodName}
+        isVisible={unlockNotification.isVisible}
+        onClose={() => setUnlockNotification({ periodName: '', isVisible: false })}
+      />
     </div>
   );
 }
