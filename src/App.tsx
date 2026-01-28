@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Flame, BookOpen } from 'lucide-react';
+import { Flame, BookOpen, X } from 'lucide-react';
 import { Checkpoint } from './components/Checkpoint';
 import { MonkCharacter } from './components/MonkCharacter';
 import { QuestionModal } from './components/QuestionModal';
@@ -33,6 +33,7 @@ function App() {
     periodName: string;
     isVisible: boolean;
   }>({ periodName: '', isVisible: false });
+  const [showLibraryHint, setShowLibraryHint] = useState(true);
 
   const handleCheckpointClick = (checkpoint: CheckpointType) => {
     console.log('Checkpoint clicked:', checkpoint);
@@ -213,6 +214,11 @@ function App() {
 
   const visibleCheckpoints = getVisibleCheckpoints();
 
+  const handleOpenLibrary = () => {
+    setShowLibrary(true);
+    setShowLibraryHint(false);
+  };
+
   return (
     <div className="min-h-screen bg-[#F5E6D3] overflow-x-hidden">
       {/* Progress Bar */}
@@ -224,32 +230,6 @@ function App() {
       </div>      {/* Completion Celebration */}
       <CompletionCelebration isVisible={progress.completedCheckpoints.length === checkpoints.length} />
 
-      {/* Journey Library Button */}
-      <motion.button
-        onClick={() => setShowLibrary(true)}
-        className="fixed top-28 right-8 z-40 bg-gradient-to-br from-amber-600 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-amber-500/50 transition-all group"
-        whileHover={{ scale: 1.1, rotate: 10 }}
-        whileTap={{ scale: 0.95 }}
-        animate={{
-          boxShadow: [
-            '0 10px 30px rgba(251, 191, 36, 0.3)',
-            '0 10px 40px rgba(251, 191, 36, 0.5)',
-            '0 10px 30px rgba(251, 191, 36, 0.3)',
-          ],
-        }}
-        transition={{
-          boxShadow: { duration: 2, repeat: Infinity },
-        }}
-      >
-        <BookOpen size={28} className="group-hover:rotate-12 transition-transform" />        <motion.div
-          className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 1, type: "spring" }}
-        >
-          {getUnlockedPeriods(progress.completedCheckpoints, checkpoints.length).length}
-        </motion.div>
-      </motion.button>
 
       {/* Main Content */}
       <div className="flex-1 relative pt-[76px]">{/* Container có thể scroll */}
@@ -443,7 +423,89 @@ function App() {
                 emotion={isCelebrating ? 'happy' : (isMonkMoving ? 'walking' : 'idle')}
                 size="small"
               />
-            </div>            {/* Completion */}
+            </div>
+
+            {/* Journey Library Button + Hint (anchored together) */}
+            <div className="absolute bottom-24 right-24 z-40">
+              <motion.button
+                onClick={handleOpenLibrary}
+                className="relative bg-gradient-to-br from-amber-600 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-amber-500/50 transition-all group"
+                whileHover={{ scale: 1.1, rotate: 10 }}
+                whileTap={{ scale: 0.95 }}
+                animate={{
+                  boxShadow: [
+                    '0 10px 30px rgba(251, 191, 36, 0.3)',
+                    '0 10px 40px rgba(251, 191, 36, 0.5)',
+                    '0 10px 30px rgba(251, 191, 36, 0.3)',
+                  ],
+                }}
+                transition={{
+                  boxShadow: { duration: 2, repeat: Infinity },
+                }}
+              >
+                <BookOpen size={60} className="group-hover:rotate-12 transition-transform" />
+                {/* <motion.div
+                  className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 1, type: "spring" }}
+                >
+                  {getUnlockedPeriods(progress.completedCheckpoints, checkpoints.length).length}
+                </motion.div> */}
+              </motion.button>
+
+              {/* Library Hint Tooltip */}
+              <AnimatePresence>
+                {showLibraryHint && (
+                  <motion.div
+                    className="absolute z-50 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border-2 border-[#8B4513]/30 p-4 w-96"
+                    style={{
+                      right: 'calc(100% + 14px)',
+                      top: '20%',
+                      transform: 'translateY(-50%)',
+                    }}
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                  >
+                    {/* Arrow pointing to button */}
+                    <div
+                      className="absolute"
+                      style={{
+                        right: -8,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        width: 0,
+                        height: 0,
+                        borderTop: '8px solid transparent',
+                        borderBottom: '8px solid transparent',
+                        borderLeft: '8px solid rgba(255,255,255,0.95)',
+                        filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.1))',
+                      }}
+                    />
+
+                    <div className="flex items-center gap-3">
+                      {/* Close button */}
+                      <button
+                        onClick={() => setShowLibraryHint(false)}
+                        className="shrink-0 text-gray-500 hover:text-gray-700 transition-colors"
+                        aria-label="Đóng"
+                      >
+                        <X size={16} />
+                      </button>
+
+                      {/* Content */}
+                      <p  className="text-sm text-[#8B4513] font-medium whitespace-nowrap ">
+                        Hãy bấm vào nút này để mở Thư viện Hành Trình
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Completion */}
             {progress.completedCheckpoints.length === checkpoints.length && (
               <motion.div
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -464,7 +526,7 @@ function App() {
                     🏛️ Thư viện hành trình sẽ tự động mở sau 3 giây...
                   </motion.div>
                   <motion.button
-                    onClick={() => setShowLibrary(true)}
+                    onClick={handleOpenLibrary}
                     className="bg-white text-orange-600 px-6 py-2 rounded-full font-bold hover:bg-orange-50 transition-colors"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

@@ -46,10 +46,10 @@ export function PhilosophicalDialogue() {
               <motion.button
                 key={question.id}
                 onClick={() => setSelectedQuestionId(question.id)}
-                className={`px-4 py-3 rounded-lg text-sm font-medium text-left transition-all ${
+                className={`px-4 py-3 rounded-lg text-sm font-medium text-left transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40 ${
                   isSelected
-                    ? 'bg-amber-600 text-white shadow-md'
-                    : 'bg-white text-amber-900 hover:bg-amber-50 border border-amber-200'
+                    ? 'bg-amber-200 text-amber-900 border-amber-500 shadow-sm'
+                    : 'bg-white text-amber-900 hover:bg-amber-50 border-amber-200'
                 }`}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}

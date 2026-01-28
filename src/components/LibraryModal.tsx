@@ -265,30 +265,8 @@ export function LibraryModal({ isOpen, onClose, checkpoints }: LibraryModalProps
                 </div>
 
                 {/* Tabs */}
-                <div 
-                  className="mt-6 overflow-x-auto pb-2"
-                  style={{
-                    scrollbarWidth: 'thin',
-                    scrollbarColor: '#fbbf24 #fef3c7',
-                  }}
-                >
-                  <style>{`
-                    div[class*="overflow-x-auto"]::-webkit-scrollbar {
-                      height: 8px;
-                    }
-                    div[class*="overflow-x-auto"]::-webkit-scrollbar-track {
-                      background: #fef3c7;
-                      border-radius: 4px;
-                    }
-                    div[class*="overflow-x-auto"]::-webkit-scrollbar-thumb {
-                      background: #fbbf24;
-                      border-radius: 4px;
-                    }
-                    div[class*="overflow-x-auto"]::-webkit-scrollbar-thumb:hover {
-                      background: #f59e0b;
-                    }
-                  `}</style>
-                  <div className="flex flex-nowrap gap-2 min-w-max">
+                <div className="mt-6">
+                  <div className="flex flex-wrap gap-2">
                     {tabs.map((tab) => {
                       const Icon = tab.icon;
                       const isActive = activeTab === tab.id;
