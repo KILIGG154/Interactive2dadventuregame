@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Flame, BookOpen, X } from 'lucide-react';
 import { Checkpoint } from './components/Checkpoint';
@@ -549,7 +549,6 @@ function App() {
             isOpen={!!selectedCheckpoint}
             onClose={() => setSelectedCheckpoint(null)}
             onAnswer={handleAnswer}
-            theory={selectedCheckpoint.theory}
             decisionMoment={
               selectedCheckpoint.decisionMomentId
                 ? decisionMoments.find((d) => d.id === selectedCheckpoint.decisionMomentId)

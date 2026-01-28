@@ -1,9 +1,8 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Lightbulb, BookOpen, Flower2, Clock } from 'lucide-react';
-import { Question, Theory, DecisionMoment } from '../types/game';
+import { Question, DecisionMoment } from '../types/game';
 import { useState, useEffect, useRef } from 'react';
 import { MonkCharacter } from './MonkCharacter';
-import { TheoryCard } from './TheoryCard';
 
 const TIMER_SECONDS = 60;
 
@@ -12,7 +11,6 @@ interface QuestionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAnswer: (correct: boolean) => void;
-  theory?: Theory;
   // Nếu có DecisionMoment → chế độ câu hỏi tình huống, không đúng/sai tuyệt đối
   decisionMoment?: DecisionMoment;
 }
@@ -22,7 +20,6 @@ export function QuestionModal({
   isOpen,
   onClose,
   onAnswer,
-  theory,
   decisionMoment,
 }: QuestionModalProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -31,7 +28,6 @@ export function QuestionModal({
   const [monkEmotion, setMonkEmotion] = useState<'idle' | 'happy' | 'sad'>('idle');
   const [wrongAttempts, setWrongAttempts] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(TIMER_SECONDS);
-  const [showTheoryPanel, setShowTheoryPanel] = useState(false);
   const [timeUp, setTimeUp] = useState(false);
   const timeoutFiredRef = useRef(false);
   const timerPausedRef = useRef(false);
@@ -49,7 +45,7 @@ export function QuestionModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    const shouldTick = !showResult && !showTheoryPanel && !timeUp;
+    const shouldTick = !showResult && !timeUp;
     timerPausedRef.current = !shouldTick;
     if (!shouldTick) return;
 
@@ -73,7 +69,7 @@ export function QuestionModal({
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isOpen, showResult, showTheoryPanel, timeUp]);
+  }, [isOpen, showResult, timeUp]);
 
   const handleSubmit = () => {
     if (selectedAnswer === null) return;
@@ -145,7 +141,6 @@ export function QuestionModal({
     setShowHint(false);
     setMonkEmotion('idle');
     setWrongAttempts(0);
-    setShowTheoryPanel(false);
     setTimeUp(false);
     setSecondsLeft(TIMER_SECONDS);
     setDecisionScore(null);
@@ -543,17 +538,6 @@ export function QuestionModal({
                       >
                         Xác nhận
                       </motion.button>
-                      {theory && (
-                        <motion.button
-                          onClick={() => setShowTheoryPanel(true)}
-                          className="px-4 py-3 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold rounded-lg transition-colors flex items-center gap-2"
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <BookOpen className="size-5" />
-                          Đọc lý thuyết
-                        </motion.button>
-                      )}
                       <motion.button
                         onClick={() => setShowHint(!showHint)}
                         className="px-4 py-3 bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold rounded-lg transition-colors"
@@ -577,50 +561,6 @@ export function QuestionModal({
                 {/* Decorative bottom border */}
                 <div className="h-4 bg-gradient-to-r from-amber-700 via-red-800 to-amber-700" />
               </div>
-
-              {/* Theory panel overlay - timer pauses while open */}
-              <AnimatePresence>
-                {showTheoryPanel && theory && (
-                  <>
-                    <motion.div
-                      className="fixed inset-0 bg-black/50 z-[60]"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      onClick={() => setShowTheoryPanel(false)}
-                    />
-                    <motion.div
-                      className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[70] p-4 w-[min(88vmin,400px)] aspect-square flex flex-col"
-                      initial={{ opacity: 0, scale: 0.96, y: 8 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.96, y: 8 }}
-                    >
-                      <div
-                        className="rounded-2xl shadow-2xl overflow-hidden border border-amber-200 flex flex-col flex-1 min-h-0"
-                        style={{
-                          background: 'linear-gradient(to bottom, #FFFBEB 0%, #FEF3C7 12%, #FFF 24%, #FFF 100%)',
-                          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(251,191,36,0.2)',
-                        }}
-                      >
-                        <div className="flex items-center justify-between px-4 py-3 border-b border-amber-200/80 bg-amber-50/80 flex-shrink-0">
-                          <span className="text-xs font-medium uppercase tracking-wide text-amber-700/90">
-                            Đang tạm dừng đồng hồ
-                          </span>
-                          <button
-                            onClick={() => setShowTheoryPanel(false)}
-                            className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm shadow-sm transition-colors"
-                          >
-                            Đóng
-                          </button>
-                        </div>
-                        <div className="overflow-y-auto flex-1 min-h-0 p-4">
-                          <TheoryCard theory={theory} compact />
-                        </div>
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
 
               {/* Floating lotus petals around modal */}
               {showResult && selectedAnswer === question.correctAnswer && (
