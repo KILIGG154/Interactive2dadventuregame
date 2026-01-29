@@ -10,7 +10,16 @@ interface QuestionModalProps {
   question: Question;
   isOpen: boolean;
   onClose: () => void;
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (result: {
+    correct: boolean;
+    pointsAwarded: number;
+    timedOut?: boolean;
+    decisionScore?: number;
+  }) => void;
+  // Được gọi khi người chơi đã sai/timeout (đánh dấu checkpoint sẽ không được cộng điểm về sau)
+  onPenalty?: () => void;
+  // App có thể truyền vào nếu checkpoint đã từng sai/timeout trước đó
+  penalized?: boolean;
   // Nếu có DecisionMoment → chế độ câu hỏi tình huống, không đúng/sai tuyệt đối
   decisionMoment?: DecisionMoment;
 }
@@ -20,6 +29,8 @@ export function QuestionModal({
   isOpen,
   onClose,
   onAnswer,
+  onPenalty,
+  penalized,
   decisionMoment,
 }: QuestionModalProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -32,6 +43,8 @@ export function QuestionModal({
   const timeoutFiredRef = useRef(false);
   const timerPausedRef = useRef(false);
   const [decisionScore, setDecisionScore] = useState<number | null>(null);
+  const [isPenalized, setIsPenalized] = useState<boolean>(!!penalized);
+  const penaltyNotifiedRef = useRef(false);
 
   // Countdown timer: 60s, pause when theory panel open or result shown; on 0 → onAnswer(false) once
   useEffect(() => {
@@ -41,6 +54,8 @@ export function QuestionModal({
     timeoutFiredRef.current = false;
     timerPausedRef.current = false;
     setDecisionScore(null);
+    setIsPenalized(!!penalized);
+    penaltyNotifiedRef.current = !!penalized;
   }, [isOpen, question.title]);
 
   useEffect(() => {
@@ -59,8 +74,13 @@ export function QuestionModal({
             setShowResult(true);
             setMonkEmotion('sad');
             setTimeout(() => {
-              onAnswer(false);
-              onClose();
+              if (!penaltyNotifiedRef.current) {
+                penaltyNotifiedRef.current = true;
+                onPenalty?.();
+              }
+              setIsPenalized(true);
+              onAnswer({ correct: false, timedOut: true, pointsAwarded: 0 });
+              handleClose();
             }, 2000);
           }
           return 0;
@@ -93,7 +113,7 @@ export function QuestionModal({
 
       // Báo về App: coi như “trả lời đúng” để mở tiến trình, nhưng App sẽ dùng score để tính điểm
       setTimeout(() => {
-        onAnswer(true);
+        onAnswer({ correct: true, pointsAwarded: analysis.score, decisionScore: analysis.score });
         handleClose();
       }, 3000);
       return;
@@ -106,11 +126,16 @@ export function QuestionModal({
       setShowResult(true);
       setMonkEmotion('happy');
       setTimeout(() => {
-        onAnswer(true);
+        onAnswer({ correct: true, pointsAwarded: isPenalized ? 0 : 100 });
         handleClose();
       }, 2500);
     } else {
       setWrongAttempts((prev) => prev + 1);
+      setIsPenalized(true);
+      if (!penaltyNotifiedRef.current) {
+        penaltyNotifiedRef.current = true;
+        onPenalty?.();
+      }
 
       if (wrongAttempts === 0) {
         setShowResult(true);
@@ -144,6 +169,7 @@ export function QuestionModal({
     setTimeUp(false);
     setSecondsLeft(TIMER_SECONDS);
     setDecisionScore(null);
+    setIsPenalized(!!penalized);
     onClose();
   };
 
@@ -280,6 +306,13 @@ export function QuestionModal({
                   </span>
                 </div>
 
+                {/* Penalty note */}
+                {isPenalized && !decisionMoment && (
+                  <div className="absolute top-4 left-4 z-10 bg-red-100 text-red-800 px-3 py-2 rounded-full text-xs font-semibold border border-red-300">
+                    Không cộng điểm cho câu này
+                  </div>
+                )}
+
                 {/* Close button */}
                 <button
                   onClick={handleClose}
@@ -330,9 +363,12 @@ export function QuestionModal({
                   <div className="space-y-3 mb-6">
                     {(decisionMoment ? decisionMoment.options.map((o) => o.text) : question.options).map((option, index) => {
                       const isSelected = selectedAnswer === index;
-                      const isCorrect = !decisionMoment && index === question.correctAnswer;
-                      const showCorrect = showResult && isCorrect && !decisionMoment;
-                      const showWrong = showResult && isSelected && !isCorrect && !decisionMoment;
+                      const isCorrectOption = !decisionMoment && index === question.correctAnswer;
+                      const showOptionFeedback =
+                        showResult && !decisionMoment && !timeUp && selectedAnswer !== null;
+                      const answeredCorrect = showOptionFeedback && selectedAnswer === question.correctAnswer;
+                      const showCorrect = showOptionFeedback && answeredCorrect && isCorrectOption;
+                      const showWrong = showOptionFeedback && !answeredCorrect && isSelected;
 
                       return (
                         <motion.button
@@ -407,9 +443,11 @@ export function QuestionModal({
                         className={`border-2 rounded-lg p-4 mb-6 ${
                           decisionMoment
                             ? 'bg-blue-50 border-blue-300'
+                            : timeUp
+                            ? 'bg-red-50 border-red-300'
                             : selectedAnswer === question.correctAnswer
                             ? 'bg-green-50 border-green-300'
-                            : 'bg-orange-50 border-orange-300'
+                            : 'bg-red-50 border-red-300'
                         }`}
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
@@ -505,7 +543,7 @@ export function QuestionModal({
                               <div className="bg-red-500 rounded-full p-2">
                                 <Clock className="size-6 text-white" />
                               </div>
-                              <span className="text-red-800 font-bold text-lg">Hết thời gian!</span>
+                              <span className="text-red-800 font-bold text-lg">Sai rồi! (Hết thời gian)</span>
                             </div>
                             <p className="text-sm text-red-800">
                               Bạn có thể bấm lại checkpoint để thử lại.
@@ -514,12 +552,12 @@ export function QuestionModal({
                         ) : (
                           <>
                             <div className="flex items-center gap-2 mb-2">
-                              <div className="bg-orange-500 rounded-full p-2">
-                                <BookOpen className="size-6 text-white" />
+                              <div className="bg-red-500 rounded-full p-2">
+                                <X className="size-6 text-white" />
                               </div>
-                              <span className="text-orange-800 font-bold text-lg">Học hỏi thêm!</span>
+                              <span className="text-red-800 font-bold text-lg">Sai rồi!</span>
                             </div>
-                            <p className="text-sm text-orange-800">{question.explanation}</p>
+                            <p className="text-sm text-red-800">{question.explanation}</p>
                           </>
                         )}
                       </motion.div>

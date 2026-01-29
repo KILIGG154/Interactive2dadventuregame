@@ -10,10 +10,24 @@ import { UnlockNotification } from './components/UnlockNotification';
 import { CompletionCelebration } from './components/CompletionCelebration';
 import { ParticleSystem } from './components/ParticleSystem';
 import { EraProgressTracker } from './components/EraProgressTracker';
+import { LeaderboardModal } from './components/LeaderboardModal';
+import { NameEntryModal } from './components/NameEntryModal';
 import { unifiedMapCheckpoints, eraRegions } from './data/unifiedMapData';
 import { decisionMoments } from './data/decisionMomentsData';
 import { getUnlockedPeriods, philosophicalPeriods } from './data/philosophicalPeriodsData';
-import { PlayerProgress, Checkpoint as CheckpointType } from './types/game';
+import { LeaderboardEntry, PlayerProgress, Checkpoint as CheckpointType, PlayerProfile } from './types/game';
+import {
+  addLeaderboardEntry,
+  loadCheckpoints,
+  loadLeaderboard,
+  loadLeaderboardSubmitted,
+  loadPlayerProfile,
+  loadProgress,
+  saveCheckpoints,
+  saveLeaderboardSubmitted,
+  savePlayerProfile,
+  saveProgress,
+} from './game/storage';
 
 function App() {
   const [selectedCheckpoint, setSelectedCheckpoint] = useState<CheckpointType | null>(null);
@@ -22,18 +36,118 @@ function App() {
   const [selectedEra, setSelectedEra] = useState<string>('Lý - Trần'); // Start with first era
   const [monkPosition, setMonkPosition] = useState({ x: 15, y: 75 });
   const [isMonkMoving, setIsMonkMoving] = useState(false);
-  const [isCelebrating, setIsCelebrating] = useState(false);  const [progress, setProgress] = useState<PlayerProgress>({
+  const [isCelebrating, setIsCelebrating] = useState(false);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [leaderboardSubmitted, setLeaderboardSubmitted] = useState(false);
+  const [leaderboardPrompted, setLeaderboardPrompted] = useState(false);
+  const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [pendingCheckpoint, setPendingCheckpoint] = useState<CheckpointType | null>(null);
+  const [progress, setProgress] = useState<PlayerProgress>({
     currentCheckpoint: 'cp-1',
     completedCheckpoints: [],
     score: 0,
     level: 1,
     achievements: [],
+    noPointCheckpoints: [],
   });
   const [unlockNotification, setUnlockNotification] = useState<{
     periodName: string;
     isVisible: boolean;
   }>({ periodName: '', isVisible: false });
   const [showLibraryHint, setShowLibraryHint] = useState(true);
+  const isCompletedAll = progress.completedCheckpoints.length === checkpoints.length;
+
+  // Load persisted state (FE-only)
+  useEffect(() => {
+    loadLeaderboard().then(setLeaderboard);
+    setLeaderboardSubmitted(loadLeaderboardSubmitted());
+
+    const savedProgress = loadProgress();
+    const savedCheckpoints = loadCheckpoints();
+    const savedProfile = loadPlayerProfile();
+
+    const reconcileCheckpointsFromProgress = (base: CheckpointType[], p: PlayerProgress) => {
+      const completed = new Set(p.completedCheckpoints);
+      const firstIncompleteIndex = base.findIndex((cp) => !completed.has(cp.id));
+
+      return base.map((cp, idx) => {
+        if (completed.has(cp.id)) return { ...cp, status: 'completed' as const };
+        if (firstIncompleteIndex === -1) return { ...cp, status: 'completed' as const };
+        if (idx === firstIncompleteIndex) return { ...cp, status: 'active' as const };
+        return { ...cp, status: 'locked' as const };
+      });
+    };
+
+    if (savedProgress) {
+      setProgress(savedProgress);
+    }
+
+    if (savedProfile) {
+      setPlayerProfile(savedProfile);
+    }
+
+    if (savedCheckpoints) {
+      setCheckpoints(savedCheckpoints);
+    } else if (savedProgress) {
+      setCheckpoints(reconcileCheckpointsFromProgress(unifiedMapCheckpoints, savedProgress));
+    }
+  }, []);
+
+  // Persist state
+  useEffect(() => {
+    saveProgress(progress);
+  }, [progress]);
+
+  useEffect(() => {
+    saveCheckpoints(checkpoints);
+  }, [checkpoints]);
+
+  // Leaderboard prompt (once) when finishing full journey
+  useEffect(() => {
+    if (isCompletedAll && !leaderboardPrompted) {
+      setShowLeaderboard(true);
+      setLeaderboardPrompted(true);
+    }
+  }, [checkpoints.length, isCompletedAll, leaderboardPrompted]);
+
+  const submitLeaderboardName = async (name: string) => {
+    // Chỉ cho submit khi đã hoàn thành toàn bộ hành trình
+    if (!isCompletedAll) return;
+    // Chống double click / double submit
+    if (leaderboardSubmitted) return;
+
+    // Luôn dùng tên mới nhập, không dùng tên cũ từ playerProfile
+    const finalName = name.trim();
+    
+    // Tạo hoặc cập nhật playerProfile với tên mới
+    const profile: PlayerProfile = {
+      name: finalName,
+      createdAt: playerProfile?.createdAt ?? Date.now(),
+    };
+    setPlayerProfile(profile);
+    savePlayerProfile(profile);
+    
+    // Lấy điểm và level hiện tại từ progress state
+    const currentScore = progress.score;
+    const currentLevel = progress.level;
+    
+    console.log('[App] Submitting leaderboard entry:', { name: finalName, score: currentScore, level: currentLevel });
+    
+    const entry: LeaderboardEntry = {
+      name: finalName,
+      score: currentScore,
+      level: currentLevel,
+      timestamp: Date.now(),
+    };
+    
+    const updated = await addLeaderboardEntry(entry, 20);
+    setLeaderboard(updated);
+    setLeaderboardSubmitted(true);
+    saveLeaderboardSubmitted(true);
+    setShowLeaderboard(false);
+  };
 
   const handleCheckpointClick = (checkpoint: CheckpointType) => {
     console.log('Checkpoint clicked:', checkpoint);
@@ -43,8 +157,29 @@ function App() {
       console.log('Checkpoint is locked!');
       return;
     }
+    if (!playerProfile) {
+      console.log('No player profile, opening name entry modal');
+      setPendingCheckpoint(checkpoint);
+      setShowNameModal(true);
+      return;
+    }
     console.log('Opening question modal');
     setSelectedCheckpoint(checkpoint);
+  };
+
+  const handleNameSubmit = (name: string) => {
+    const profile: PlayerProfile = {
+      name,
+      createdAt: Date.now(),
+    };
+    setPlayerProfile(profile);
+    savePlayerProfile(profile);
+    setShowNameModal(false);
+
+    if (pendingCheckpoint && pendingCheckpoint.status !== 'locked') {
+      setSelectedCheckpoint(pendingCheckpoint);
+    }
+    setPendingCheckpoint(null);
   };
 
   const moveMonkToCheckpoint = (targetX: number, targetY: number) => {
@@ -72,33 +207,49 @@ function App() {
     }, duration / steps);
   };
 
-  const handleAnswer = (correct: boolean) => {
+  const markCheckpointPenalized = (checkpointId: string) => {
+    setProgress((prev) => {
+      if (prev.noPointCheckpoints.includes(checkpointId)) return prev;
+      return { ...prev, noPointCheckpoints: [...prev.noPointCheckpoints, checkpointId] };
+    });
+  };
+
+  const handleAnswer = (result: {
+    correct: boolean;
+    pointsAwarded: number;
+    timedOut?: boolean;
+    decisionScore?: number;
+  }) => {
     if (!selectedCheckpoint) return;
+    const checkpointId = selectedCheckpoint.id;
 
-    // Nếu là Decision Moment → dùng score từ phân tích triết học thay vì đúng/sai đơn giản
-    const dm = selectedCheckpoint.decisionMomentId
-      ? decisionMoments.find((d) => d.id === selectedCheckpoint.decisionMomentId)
-      : undefined;
-
-    let scoreChange: number;
-    if (dm && correct) {
-      // Ở chế độ Decision Moment, QuestionModal đã xác nhận là một lựa chọn hợp lệ,
-      // phần điểm chi tiết có thể được gán ở đây trong tương lai (hiện tại +100 để đơn giản).
-      scoreChange = 100;
-    } else {
-      scoreChange = correct ? 100 : -20;
+    // Sai / hết giờ: không hoàn thành checkpoint, không cộng điểm
+    if (!result.correct) {
+      setSelectedCheckpoint(null);
+      return;
     }
-    const newScore = Math.max(0, progress.score + scoreChange);
+
+    // Nếu checkpoint đã hoàn thành rồi thì không cộng/không unlock lại (chống farm điểm)
+    if (progress.completedCheckpoints.includes(checkpointId)) {
+      setSelectedCheckpoint(null);
+      return;
+    }
+
+    // Nếu đã từng sai/timeout ở checkpoint này → về sau trả lời đúng cũng 0 điểm
+    const isPenalized = progress.noPointCheckpoints.includes(checkpointId);
+    const pointsAwarded = isPenalized ? 0 : Math.max(0, Math.floor(result.pointsAwarded || 0));
+
+    const newScore = Math.max(0, progress.score + pointsAwarded);
     const newLevel = Math.floor(newScore / 500) + 1;
 
     const updatedCheckpoints = checkpoints.map((cp) => {
-      if (cp.id === selectedCheckpoint.id) {
+      if (cp.id === checkpointId) {
         return { ...cp, status: 'completed' as const };
       }
       return cp;
     });
 
-    const currentIndex = checkpoints.findIndex((cp) => cp.id === selectedCheckpoint.id);
+    const currentIndex = checkpoints.findIndex((cp) => cp.id === checkpointId);
     
     // Check if this is the last checkpoint of the current era
     const currentEra = eraRegions.find(
@@ -113,7 +264,8 @@ function App() {
       moveMonkToCheckpoint(nextCheckpoint.x, nextCheckpoint.y);
     }
 
-    setCheckpoints(updatedCheckpoints);    const newCompletedCheckpoints = [...progress.completedCheckpoints, selectedCheckpoint.id];
+    setCheckpoints(updatedCheckpoints);
+    const newCompletedCheckpoints = [...progress.completedCheckpoints, checkpointId];
     const newAchievements = [...progress.achievements];
 
     // Check for newly unlocked periods
@@ -133,15 +285,45 @@ function App() {
       setTimeout(() => {
         setShowLibrary(true);
       }, 3000); // Đợi 3 giây sau khi hiển thị thông báo hoàn thành
+
+      // Khi người chơi hoàn thành toàn bộ hành trình, tự động lưu điểm vào leaderboard (nếu có tên)
+      if (!leaderboardSubmitted && playerProfile) {
+        // Set cờ ngay để tránh bị gọi 2 lần (auto-submit + người dùng bấm tay)
+        setLeaderboardSubmitted(true);
+        saveLeaderboardSubmitted(true);
+
+        const autoEntry: LeaderboardEntry = {
+          name: playerProfile.name,
+          score: newScore,
+          level: newLevel,
+          timestamp: Date.now(),
+        };
+
+        console.log('[App] Auto-submitting leaderboard entry on completion:', autoEntry);
+
+        addLeaderboardEntry(autoEntry, 20)
+          .then((updated) => {
+            setLeaderboard(updated);
+          })
+          .catch((error) => {
+            console.error('[App] Failed to auto submit leaderboard entry:', error);
+            // Nếu submit lỗi, cho phép user thử lại (mở khoá submit)
+            setLeaderboardSubmitted(false);
+            saveLeaderboardSubmitted(false);
+          });
+      }
     }
 
-    setProgress({
-      currentCheckpoint: currentIndex < checkpoints.length - 1 ? checkpoints[currentIndex + 1].id : selectedCheckpoint.id,
+    setProgress((prev) => ({
+      currentCheckpoint: currentIndex < checkpoints.length - 1 ? checkpoints[currentIndex + 1].id : checkpointId,
       completedCheckpoints: newCompletedCheckpoints,
       score: newScore,
       level: newLevel,
       achievements: newAchievements,
-    });    // Celebrate if completed an era
+      noPointCheckpoints: prev.noPointCheckpoints,
+    }));
+
+    // Celebrate if completed an era
     if (isLastCheckpointOfEra) {
       setIsCelebrating(true);
       setTimeout(() => {
@@ -226,6 +408,7 @@ function App() {
         <ProgressBar
           completionPercentage={calculateCompletionPercentage()}
           currentEra={getCurrentEra()}
+          onLeaderboardClick={() => setShowLeaderboard(true)}
         />
       </div>      {/* Completion Celebration */}
       <CompletionCelebration isVisible={progress.completedCheckpoints.length === checkpoints.length} />
@@ -243,6 +426,7 @@ function App() {
           score={progress.score}
           level={progress.level}
           achievements={progress.achievements}
+          leaderboard={leaderboard}
         />
         
         {/* Vintage Map Area */}
@@ -527,10 +711,12 @@ function App() {
                   </motion.div>
                   <motion.button
                     onClick={handleOpenLibrary}
-                    className="bg-white text-orange-600 px-6 py-2 rounded-full font-bold hover:bg-orange-50 transition-colors"
+                    className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-12 py-4 rounded-full font-bold shadow-lg transition-all"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 1.5 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     Mở Thư Viện Ngay
                   </motion.button>
@@ -549,6 +735,8 @@ function App() {
             isOpen={!!selectedCheckpoint}
             onClose={() => setSelectedCheckpoint(null)}
             onAnswer={handleAnswer}
+            onPenalty={() => markCheckpointPenalized(selectedCheckpoint.id)}
+            penalized={progress.noPointCheckpoints.includes(selectedCheckpoint.id)}
             decisionMoment={
               selectedCheckpoint.decisionMomentId
                 ? decisionMoments.find((d) => d.id === selectedCheckpoint.decisionMomentId)
@@ -567,6 +755,26 @@ function App() {
         periodName={unlockNotification.periodName}
         isVisible={unlockNotification.isVisible}
         onClose={() => setUnlockNotification({ periodName: '', isVisible: false })}
+      />
+
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+        entries={leaderboard}
+        finalScore={progress.score}
+        finalLevel={progress.level}
+        onSubmitName={submitLeaderboardName}
+        hasSubmitted={leaderboardSubmitted}
+        canSubmit={isCompletedAll && !leaderboardSubmitted}
+        initialName={playerProfile?.name}
+        nameLocked={!!playerProfile}
+      />
+
+      <NameEntryModal
+        isOpen={showNameModal}
+        onClose={() => setShowNameModal(false)}
+        onSubmit={handleNameSubmit}
+        existingEntries={leaderboard}
       />
     </div>
   );

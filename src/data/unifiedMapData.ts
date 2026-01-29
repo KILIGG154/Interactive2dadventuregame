@@ -77,6 +77,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Thiền Lâm Tế'
       ],
       correctAnswer: 1,
+      hint: '💡 Gợi ý: Triết lý nhấn mạnh bốn đại (đất, nước, lửa, gió) đều vô thường, không thật có.',
       explanation: 'Thiền sư Vạn Hạnh nổi tiếng với triết lý "Tứ đại giai không" - vạn vật đều vô thường.',
     },
     theory: {
@@ -103,6 +104,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Thiền Vô Ngôn Thông'
       ],
       correctAnswer: 2,
+      hint: '💡 Gợi ý: Thiền phái mang bản sắc Việt Nam, gắn với núi Yên Tử.',
       explanation: 'Trần Nhân Tông là vị vua duy nhất trong lịch sử Việt Nam xuất gia, sáng lập thiền phái Trúc Lâm Yên Tử.',
       historicalFigure: 'Trần Nhân Tông',
     },
@@ -132,6 +134,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Lê Thánh Tông'
       ],
       correctAnswer: 2,
+      hint: '💡 Gợi ý: Chính vị vua đã sáng lập thiền phái Trúc Lâm Yên Tử.',
       explanation: 'Trần Nhân Tông xuất gia tu tại Yên Tử và sáng lập thiền phái Trúc Lâm tại đây.',
     },
     theory: {
@@ -160,6 +163,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Phật giáo bị suy thoái'
       ],
       correctAnswer: 1,
+      hint: '💡 Gợi ý: Thời Tây Sơn, Phật giáo ít tập trung ở cung đình, mà gần gũi với đời sống làng quê.',
       explanation: 'Thời Tây Sơn, Phật giáo gắn bó mật thiết với đời sống dân gian, ít chịu ảnh hưởng triều đình.',
     },
     theory: {
@@ -186,6 +190,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Chỉ dành cho tu sĩ'
       ],
       correctAnswer: 1,
+      hint: '💡 Gợi ý: Đây không chỉ là nơi thờ phượng, mà còn là nơi sinh hoạt văn hóa, học chữ của dân làng.',
       explanation: 'Chùa làng là trung tâm văn hóa, giáo dục và sinh hoạt cộng đồng của làng xã Việt Nam.',
     },
     theory: {
@@ -214,6 +219,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Tháp Linh Mụ'
       ],
       correctAnswer: 1,
+      hint: '💡 Gợi ý: Đó là tòa tháp bát giác cao 7 tầng, biểu tượng của chùa.',
       explanation: 'Tháp Phước Duyên cao 21m với 7 tầng là biểu tượng của chùa Thiên Mụ và cố đô Huế.',
     },
     theory: {
@@ -240,6 +246,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Thiền sư Thích Nhất Hạnh'
       ],
       correctAnswer: 2,
+      hint: '💡 Gợi ý: Đáp án là một cư sĩ, không phải vị thiền sư hay hòa thượng nổi tiếng về sau.',
       explanation: 'Cư sĩ Lê Đình Thám là một trong những người khởi xướng phong trào cải cách Phật giáo Việt Nam đầu thế kỷ 20.',
     },
     theory: {
@@ -266,6 +273,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         '1963'
       ],
       correctAnswer: 1,
+      hint: '💡 Gợi ý: Năm thành lập nằm giữa hai mốc 1945 và 1963.',
       explanation: 'Giáo hội Phật giáo Việt Nam thống nhất được thành lập năm 1951 tại Huế.',
     },
     theory: {
@@ -294,6 +302,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Dòng Liễu Quán'
       ],
       correctAnswer: 1,
+      hint: '💡 Gợi ý: Tên dòng tu gắn với một ngôi làng ở Pháp, nơi ngài lập tăng đoàn.',
       explanation: 'Thiền sư Thích Nhất Hạnh sáng lập dòng tu Làng Mai (Plum Village) tại Pháp, phổ biến thiền chánh niệm ra toàn thế giới.',
       historicalFigure: 'Thích Nhất Hạnh',
     },
@@ -321,6 +330,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Phật giáo từ thiện'
       ],
       correctAnswer: 1,
+      hint: '💡 Gợi ý: Nhập thế nghĩa là đem đạo vào đời, tham gia phục vụ cộng đồng.',
       explanation: 'Phật giáo nhập thế là xu hướng Phật giáo tham gia tích cực vào các hoạt động xã hội, từ thiện, giáo dục để phục vụ cộng đồng.',
     },
     theory: {
@@ -347,6 +357,7 @@ export const unifiedMapCheckpoints: Checkpoint[] = [
         'Sài Gòn'
       ],
       correctAnswer: 0,
+      hint: '💡 Gợi ý: Thiền viện nằm ở thành phố cao nguyên có hồ Tuyền Lâm.',
       explanation: 'Thiền viện Trúc Lâm Đà Lạt là một trong những thiền viện nổi tiếng nhất Việt Nam, nằm giữa khung cảnh thiên nhiên tuyệt đẹp.',
     },
     theory: {

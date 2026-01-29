@@ -1,13 +1,14 @@
 import { motion } from 'motion/react';
-import { Flower2 } from 'lucide-react';
+import { Flower2, Trophy } from 'lucide-react';
 import { PracticeLevelBadge } from './ui/PracticeLevelBadge';
 
 interface ProgressBarProps {
   completionPercentage: number;
   currentEra: string;
+  onLeaderboardClick?: () => void;
 }
 
-export function ProgressBar({ completionPercentage, currentEra }: ProgressBarProps) {
+export function ProgressBar({ completionPercentage, currentEra, onLeaderboardClick }: ProgressBarProps) {
   const eras = [
     { name: 'Lý - Trần', period: '11-14' },
     { name: 'Tây Sơn', period: '18' },
@@ -105,6 +106,22 @@ export function ProgressBar({ completionPercentage, currentEra }: ProgressBarPro
 
         {/* Practice level (mapped by era) + completion percent */}
         <PracticeLevelBadge eraName={currentEra} progressPercent={completionPercentage} />
+
+        {/* Leaderboard Button */}
+        {onLeaderboardClick && (
+          <motion.button
+            onClick={onLeaderboardClick}
+            className="bg-gradient-to-br from-amber-500 to-orange-500 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all border-2 border-white"
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.6, type: 'spring' }}
+            aria-label="Xem bảng xếp hạng"
+          >
+            <Trophy className="size-5" />
+          </motion.button>
+        )}
       </div>
     </div>
   );

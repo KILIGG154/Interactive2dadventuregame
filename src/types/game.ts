@@ -51,6 +51,21 @@ export interface PlayerProgress {
   score: number;
   level: number;
   achievements: string[];
+  // Những checkpoint đã từng sai hoặc hết giờ → về sau trả lời đúng cũng không được cộng điểm
+  noPointCheckpoints: string[];
+}
+
+export interface LeaderboardEntry {
+  name: string;
+  score: number;
+  level: number;
+  timestamp: number;
+}
+
+// Hồ sơ người chơi – lưu tên duy nhất trên máy
+export interface PlayerProfile {
+  name: string;
+  createdAt: number;
 }
 
 // New interfaces for Journey Library

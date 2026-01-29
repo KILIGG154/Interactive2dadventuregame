@@ -46,75 +46,84 @@ export function FolkCultureSection() {
       </div>
 
       {/* Two-column layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Left: Category selector */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg p-3 border border-amber-200 shadow-sm">
-            <h4 className="text-sm font-semibold text-amber-900 mb-2">Danh mục</h4>
-            <div className="space-y-1.5">
-              {folkCategories.map((category) => {
-                const Icon = getCategoryIcon(category.type);
-                const isActive = selectedCategory === category.type;
-                const itemCount = getCategoryItemCount(category.type);
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(260px,320px)_1fr] gap-4">
+        {/* Left: Category selector + Item list (2 phần Danh mục / Nội dung) */}
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {/* Danh mục */}
+            <div className="bg-white rounded-lg p-3 border border-amber-200 shadow-sm">
+              <h4 className="text-sm font-semibold text-amber-900 mb-2">Danh mục</h4>
+              <div className="space-y-1.5">
+                {folkCategories.map((category) => {
+                  const Icon = getCategoryIcon(category.type);
+                  const isActive = selectedCategory === category.type;
+                  const itemCount = getCategoryItemCount(category.type);
 
-                return (
-                  <motion.button
-                    key={category.id}
-                    onClick={() => {
-                      setSelectedCategory(category.type);
-                      setSelectedItemId(null);
-                    }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium transition-all text-left ${
-                      isActive
-                        ? 'bg-amber-200 text-amber-900 border border-amber-500'
-                        : 'bg-white text-amber-900 hover:bg-amber-50 border border-amber-200'
-                    }`}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                  >
-                    <Icon className="size-4 flex-shrink-0 text-amber-700" />
-                    <div className="flex-1">
-                      <div className="text-sm font-semibold text-amber-900 leading-snug">
-                        {category.title}
-                      </div>
-                      <div className={`text-[11px] ${isActive ? 'text-amber-800' : 'text-gray-500'}`}>
-                        {itemCount} mục
-                      </div>
-                    </div>
-                  </motion.button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Item list */}
-          {categoryItems.length > 0 && (
-            <div className="mt-3 bg-white rounded-lg p-3 border border-amber-200 shadow-sm">
-              <h4 className="text-sm font-semibold text-amber-900 mb-2">Nội dung</h4>
-              <div className="max-h-56 overflow-y-auto pr-1 space-y-1.5">
-                {categoryItems.map((item) => {
-                  const isSelected = validSelectedItemId === item.id || (!validSelectedItemId && item.id === categoryItems[0]?.id);
                   return (
-                    <button
-                      key={item.id}
-                      onClick={() => setSelectedItemId(item.id)}
-                      className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all leading-snug ${
-                        isSelected
+                    <motion.button
+                      key={category.id}
+                      onClick={() => {
+                        setSelectedCategory(category.type);
+                        setSelectedItemId(null);
+                      }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-md font-medium transition-all ${
+                        isActive
                           ? 'bg-amber-200 text-amber-900 border border-amber-500'
                           : 'bg-white text-amber-900 hover:bg-amber-50 border border-amber-200'
                       }`}
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                     >
-                      {item.title}
-                    </button>
+                    <Icon className="size-4 flex-shrink-0 text-amber-700" />
+                    <div className="flex-1 flex items-center justify-between gap-2">
+                      <span className="text-sm font-semibold text-amber-900 leading-snug whitespace-nowrap">
+                        {category.title}
+                      </span>
+                      <span
+                        className={`text-[11px] whitespace-nowrap ${
+                          isActive ? 'text-amber-800' : 'text-gray-500'
+                        }`}
+                      >
+                        {itemCount} mục
+                      </span>
+                    </div>
+                    </motion.button>
                   );
                 })}
               </div>
             </div>
-          )}
+
+            {/* Nội dung */}
+            {categoryItems.length > 0 && (
+              <div className="bg-white rounded-lg p-3 border border-amber-200 shadow-sm">
+                <h4 className="text-sm font-semibold text-amber-900 mb-2">Nội dung</h4>
+                <div className="max-h-56 overflow-y-auto pr-1 space-y-1.5">
+                  {categoryItems.map((item) => {
+                    const isSelected =
+                      validSelectedItemId === item.id ||
+                      (!validSelectedItemId && item.id === categoryItems[0]?.id);
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => setSelectedItemId(item.id)}
+                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-all leading-snug ${
+                          isSelected
+                            ? 'bg-amber-200 text-amber-900 border border-amber-500'
+                            : 'bg-white text-amber-900 hover:bg-amber-50 border border-amber-200'
+                        }`}
+                      >
+                        {item.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right: Content display */}
-        <div className="lg:col-span-2">
+        <div>
           <AnimatePresence mode="wait">
             {selectedItem && (
               <motion.div

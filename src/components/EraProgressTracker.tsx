@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Check, Lock, Trophy, Star, Award } from 'lucide-react';
-import { useState } from 'react';
+import type { LeaderboardEntry } from '../types/game';
 
 interface Era {
   name: string;
@@ -20,6 +20,7 @@ interface EraProgressTrackerProps {
   score: number;
   level: number;
   achievements: string[];
+  leaderboard?: LeaderboardEntry[];
 }
 
 export function EraProgressTracker({
@@ -31,6 +32,7 @@ export function EraProgressTracker({
   score,
   level,
   achievements,
+  leaderboard,
 }: EraProgressTrackerProps) {
   const getEraProgress = (era: Era) => {
     const eraCheckpoints = allCheckpoints.slice(era.startCheckpoint, era.endCheckpoint + 1);
@@ -315,6 +317,33 @@ export function EraProgressTracker({
                 >
                   🏆 {achievement}
                 </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Leaderboard */}
+        {leaderboard && leaderboard.length > 0 && (
+          <div className="p-6 pt-0">
+            <h3 className="text-lg font-serif font-bold text-[#8B4513] mb-3 flex items-center gap-2 whitespace-nowrap">
+              <Trophy className="size-5 text-[#C4302B]" />
+              Bảng Xếp Hạng
+            </h3>
+            <div className="space-y-2">
+              {leaderboard.slice(0, 5).map((e, idx) => (
+                <div
+                  key={`${e.name}-${e.timestamp}-${idx}`}
+                  className="bg-white/80 rounded-xl p-3 border-2 border-[#8B4513]/20 flex items-center justify-between gap-3"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-7 text-center font-bold text-[#8B4513]">{idx + 1}</div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold text-gray-900 truncate">{e.name}</div>
+                      <div className="text-[11px] text-gray-600">Cấp độ {e.level}</div>
+                    </div>
+                  </div>
+                  <div className="text-sm font-bold text-[#C4302B]">{e.score}</div>
+                </div>
               ))}
             </div>
           </div>
