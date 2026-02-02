@@ -10,12 +10,10 @@ export function AskAISection() {
   const [error, setError] = useState<string | null>(null);
   const submittingRef = useRef(false);
 
-  const hasKey = canUsePhilosophyAI();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = userMessage.trim();
-    if (!trimmed || !hasKey) return;
+    if (!trimmed) return;
     if (submittingRef.current) return;
     submittingRef.current = true;
     setError(null);
@@ -25,32 +23,12 @@ export function AskAISection() {
       const text = await askPhilosophyAI(trimmed);
       setAiResponse(text);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Không thể kết nối. Kiểm tra API key hoặc mạng.');
+      setError(err instanceof Error ? err.message : 'Không thể kết nối tới ChatBox API. Vui lòng thử lại sau.');
     } finally {
       setLoading(false);
       submittingRef.current = false;
     }
   };
-
-  if (!hasKey) {
-    return (
-      <div className="space-y-6">
-        <div className="text-center mb-6">
-          <h3 className="text-2xl font-bold text-amber-900 mb-2">Hỏi AI về triết học</h3>
-          <p className="text-gray-600">Đặt câu hỏi về triết học Phật giáo Việt Nam, AI sẽ trả lời ngắn gọn.</p>
-        </div>
-        <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-6 text-center">
-          <AlertCircle className="size-10 text-amber-600 mx-auto mb-3" />
-          <p className="text-amber-900 font-medium">
-            Thêm <code className="bg-amber-200 px-1 rounded">VITE_GOOGLE_AI_API_KEY</code> vào file <code className="bg-amber-200 px-1 rounded">.env</code> để sử dụng Hỏi AI.
-          </p>
-          <p className="text-sm text-amber-800 mt-2">
-            Lấy API key tại: <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="underline">Google AI Studio</a>
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
