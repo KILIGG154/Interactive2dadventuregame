@@ -12,6 +12,7 @@ import { ParticleSystem } from './components/ParticleSystem';
 import { EraProgressTracker } from './components/EraProgressTracker';
 import { LeaderboardModal } from './components/LeaderboardModal';
 import { NameEntryModal } from './components/NameEntryModal';
+import { ChatWidget } from './components/ChatWidget';
 import { unifiedMapCheckpoints, eraRegions } from './data/unifiedMapData';
 import { decisionMoments } from './data/decisionMomentsData';
 import { getUnlockedPeriods, philosophicalPeriods } from './data/philosophicalPeriodsData';
@@ -776,6 +777,9 @@ function App() {
         onSubmit={handleNameSubmit}
         existingEntries={leaderboard}
       />
+
+      {/* Floating AI Chat button/panel (bottom-right) */}
+      <ChatWidget />
     </div>
   );
 }

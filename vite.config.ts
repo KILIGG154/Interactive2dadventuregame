@@ -56,5 +56,13 @@
     server: {
       port: 3000,
       open: true,
+      proxy: {
+        // Dev-only proxy to avoid CORS when calling the hosted chatbox API
+        '/api/chat': {
+          target: 'https://mln101-aichatbox.onrender.com',
+          changeOrigin: true,
+          secure: true,
+        },
+      },
     },
   });
