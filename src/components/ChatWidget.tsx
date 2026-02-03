@@ -1,13 +1,17 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Bot, Send, X, MessageCircle, AlertCircle, Trash2 } from 'lucide-react';
+import { AlertCircle, Bot, MessageCircle, Send, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useMemo, useRef, useState } from 'react';
 import { askPhilosophyAI } from '../services/geminiPhilosophy';
 
 type ChatRole = 'user' | 'ai';
 type ChatMessage = { id: string; role: ChatRole; text: string };
 const TYPING_ID = 'ai-typing';
 
-export function ChatWidget() {
+interface ChatWidgetProps {
+  inline?: boolean;
+}
+
+export function ChatWidget({ inline = false }: ChatWidgetProps) {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -84,7 +88,7 @@ export function ChatWidget() {
     // Hard-force fixed positioning above all layers (avoid stacking-context quirks)
     <div
       className="pointer-events-auto"
-      style={{
+      style={inline ? {} : {
         position: 'fixed',
         right: 24,
         bottom: 24,
@@ -274,26 +278,24 @@ export function ChatWidget() {
         <motion.button
           type="button"
           onClick={handleToggle}
-          className="relative rounded-full w-14 h-14 bg-gradient-to-br from-amber-600 to-orange-600 text-white shadow-2xl transition-all inline-flex items-center justify-center"
-          style={{
+          className="relative rounded-full p-4 bg-gradient-to-br from-amber-600 to-orange-600 text-white shadow-2xl hover:shadow-amber-500/50 transition-all inline-flex items-center justify-center group"
+          style={inline ? {} : {
             position: 'fixed',
             right: 24,
             bottom: 24,
             zIndex: 2147483647,
           }}
-          whileHover={{ scale: 1.08, rotate: 6 }}
-          whileTap={{ scale: 0.94 }}
+          whileHover={{ scale: 1.1, rotate: 10 }}
+          whileTap={{ scale: 0.95 }}
           animate={{
-            scale: [1, 1.06, 1],
             boxShadow: [
-              '0 14px 30px rgba(245, 158, 11, 0.35)',
-              '0 18px 40px rgba(245, 158, 11, 0.55)',
-              '0 14px 30px rgba(245, 158, 11, 0.35)',
+              '0 10px 30px rgba(251, 191, 36, 0.3)',
+              '0 10px 40px rgba(251, 191, 36, 0.5)',
+              '0 10px 30px rgba(251, 191, 36, 0.3)',
             ],
           }}
           transition={{
-            boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-            scale: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
+            boxShadow: { duration: 2, repeat: Infinity },
           }}
           aria-label="Mở AI chat"
         >
@@ -307,7 +309,7 @@ export function ChatWidget() {
 
           <span className="absolute -top-1 -right-1 size-3 rounded-full bg-emerald-400 border-2 border-white" />
           <span className="relative">
-            <MessageCircle className="size-7" />
+            <MessageCircle size={60} className="group-hover:rotate-12 transition-transform" />
           </span>
         </motion.button>
       )}

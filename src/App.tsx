@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Flame, BookOpen, X } from 'lucide-react';
+import { BookOpen, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { ChatWidget } from './components/ChatWidget';
 import { Checkpoint } from './components/Checkpoint';
-import { MonkCharacter } from './components/MonkCharacter';
-import { QuestionModal } from './components/QuestionModal';
-import { ProgressBar } from './components/ProgressBar';
-import { LibraryModal } from './components/LibraryModal';
-import { UnlockNotification } from './components/UnlockNotification';
 import { CompletionCelebration } from './components/CompletionCelebration';
-import { ParticleSystem } from './components/ParticleSystem';
 import { EraProgressTracker } from './components/EraProgressTracker';
 import { LeaderboardModal } from './components/LeaderboardModal';
+import { LibraryModal } from './components/LibraryModal';
+import { MonkCharacter } from './components/MonkCharacter';
 import { NameEntryModal } from './components/NameEntryModal';
-import { ChatWidget } from './components/ChatWidget';
-import { unifiedMapCheckpoints, eraRegions } from './data/unifiedMapData';
+import { ParticleSystem } from './components/ParticleSystem';
+import { ProgressBar } from './components/ProgressBar';
+import { QuestionModal } from './components/QuestionModal';
+import { UnlockNotification } from './components/UnlockNotification';
 import { decisionMoments } from './data/decisionMomentsData';
 import { getUnlockedPeriods, philosophicalPeriods } from './data/philosophicalPeriodsData';
-import { LeaderboardEntry, PlayerProgress, Checkpoint as CheckpointType, PlayerProfile } from './types/game';
+import { eraRegions, unifiedMapCheckpoints } from './data/unifiedMapData';
 import {
   addLeaderboardEntry,
   loadCheckpoints,
@@ -29,6 +28,7 @@ import {
   savePlayerProfile,
   saveProgress,
 } from './game/storage';
+import { Checkpoint as CheckpointType, LeaderboardEntry, PlayerProfile, PlayerProgress } from './types/game';
 
 function App() {
   const [selectedCheckpoint, setSelectedCheckpoint] = useState<CheckpointType | null>(null);
@@ -610,8 +610,12 @@ function App() {
               />
             </div>
 
-            {/* Journey Library Button + Hint (anchored together) */}
-            <div className="absolute bottom-24 right-24 z-40">
+            {/* Journey Library Button + Chat Button + Hint (anchored together) */}
+            <div className="absolute bottom-24 right-24 z-40 flex items-center gap-4">
+              {/* Chat Widget Button */}
+              <ChatWidget inline />
+
+              {/* Library Button */}
               <motion.button
                 onClick={handleOpenLibrary}
                 className="relative bg-gradient-to-br from-amber-600 to-orange-600 text-white p-4 rounded-full shadow-2xl hover:shadow-amber-500/50 transition-all group"
@@ -682,7 +686,7 @@ function App() {
 
                       {/* Content */}
                       <p  className="text-sm text-[#8B4513] font-medium whitespace-nowrap ">
-                        Hãy bấm vào nút này để mở Thư viện Hành Trình
+                        Hãy bấm vào nút này để mở AI Chat Box hoặc Thư viện Hành Trình
                       </p>
                     </div>
                   </motion.div>
@@ -777,9 +781,6 @@ function App() {
         onSubmit={handleNameSubmit}
         existingEntries={leaderboard}
       />
-
-      {/* Floating AI Chat button/panel (bottom-right) */}
-      <ChatWidget />
     </div>
   );
 }
