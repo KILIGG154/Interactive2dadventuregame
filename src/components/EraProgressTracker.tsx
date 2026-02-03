@@ -1,5 +1,5 @@
+import { Award, Check, Lock, Star, Trophy } from 'lucide-react';
 import { motion } from 'motion/react';
-import { Check, Lock, Trophy, Star, Award } from 'lucide-react';
 import type { LeaderboardEntry } from '../types/game';
 
 interface Era {
@@ -71,7 +71,7 @@ export function EraProgressTracker({
       >
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-br from-amber-50 to-orange-50 p-6 border-b-4 border-[#8B4513]/20 z-10">
-          <h2 className="text-2xl font-serif font-bold text-[#8B4513] mb-4 text-center">
+          <h2 className="text-2xl font-bold text-[#8B4513] mb-4 text-center">
             🙏 Hành Trình Tu Tập
           </h2>
           
@@ -115,7 +115,7 @@ export function EraProgressTracker({
 
         {/* Era Chain */}
         <div className="p-6">
-          <h3 className="text-lg font-serif font-bold text-[#8B4513] mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-[#8B4513] mb-4 flex items-center gap-2">
             <span className="text-xl">📿</span>
             Chuỗi Giai Đoạn Lịch Sử
           </h3>
@@ -219,7 +219,7 @@ export function EraProgressTracker({
                         {/* Info */}
                         <div className="flex-1">
                           <h3 
-                            className="font-serif font-bold text-lg mb-1"
+                            className="font-bold text-lg mb-1"
                             style={{ color: era.color }}
                           >
                             {era.name}
@@ -302,7 +302,7 @@ export function EraProgressTracker({
         {/* Achievements section */}
         {achievements.length > 0 && (
           <div className="p-6 pt-0">
-            <h3 className="text-lg font-serif font-bold text-[#8B4513] mb-3 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-[#8B4513] mb-3 flex items-center gap-2">
               <Award className="size-5 text-[#C4302B]" />
               Thành Tựu
             </h3>
@@ -325,7 +325,7 @@ export function EraProgressTracker({
         {/* Leaderboard */}
         {leaderboard && leaderboard.length > 0 && (
           <div className="p-6 pt-0">
-            <h3 className="text-lg font-serif font-bold text-[#8B4513] mb-3 flex items-center gap-2 whitespace-nowrap">
+            <h3 className="text-lg font-bold text-[#8B4513] mb-3 flex items-center gap-2 whitespace-nowrap">
               <Trophy className="size-5 text-[#C4302B]" />
               Bảng Xếp Hạng
             </h3>

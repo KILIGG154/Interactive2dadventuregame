@@ -1,8 +1,8 @@
+import { ShieldAlert, User, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
-import { X, User, ShieldAlert } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import type { LeaderboardEntry } from '../types/game';
 import { validatePlayerName, type NameValidationErrorCode } from '../game/nameValidation';
+import type { LeaderboardEntry } from '../types/game';
 
 interface NameEntryModalProps {
   isOpen: boolean;
@@ -108,7 +108,7 @@ export function NameEntryModal({ isOpen, onClose, onSubmit, existingEntries }: N
                       <User className="size-5 sm:size-6 text-white" />
                     </div>
                     <div className="space-y-1">
-                      <h2 className="text-base sm:text-lg font-serif font-bold text-[#8B4513]">
+                      <h2 className="text-base sm:text-lg font-bold text-[#8B4513]">
                         Đặt tên người chơi
                       </h2>
                       <p className="text-[10px] sm:text-[11px] text-[#8B4513]/70 leading-snug">

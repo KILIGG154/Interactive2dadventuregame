@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'motion/react';
 import { Trophy, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 import type { LeaderboardEntry } from '../types/game';
 
@@ -78,7 +78,7 @@ export function LeaderboardModal({
                         <Trophy className="size-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-2xl font-serif font-bold text-[#8B4513] whitespace-nowrap">
+                        <h2 className="text-2xl font-bold text-[#8B4513] whitespace-nowrap">
                           Bảng xếp hạng
                         </h2>
                         <p className="text-xs text-[#8B4513]/70">

@@ -97,28 +97,45 @@ export function ChatWidget({ inline = false }: ChatWidgetProps) {
     >
       <AnimatePresence>
         {open && (
-          <motion.div
-            key="chat-panel"
-            initial={{ opacity: 0, y: 16, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-            className="mb-4 rounded-2xl shadow-2xl overflow-hidden border-2 border-amber-200 bg-white flex flex-col"
-            style={{ width: 420, height: '78vh', maxHeight: 680 }}
-          >
+          <>
+            {/* Backdrop overlay */}
+            <motion.div
+              key="chat-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+              style={{ zIndex: 2147483646 }}
+              onClick={() => setOpen(false)}
+            />
+            {/* Centered chat panel */}
+            <motion.div
+              key="chat-panel"
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl shadow-2xl overflow-hidden border-2 border-amber-200 bg-white flex flex-col"
+              style={{ width: 420, height: '78vh', maxHeight: 680, zIndex: 2147483647 }}
+            >
             {/* Header */}
             <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white px-4 py-3 flex items-center justify-between text-[12px]">
+              {/* Left spacer for balance */}
+              <div className="w-9" />
+              
+              {/* Center content */}
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="size-9 rounded-full bg-white/20 flex items-center justify-center">
                     <Bot className="size-5" />
                   </div>
                 </div>
-                <div className="leading-tight">
+                <div className="leading-tight text-center">
                   <div className="font-extrabold text-[13px]">Trợ lý AI</div>
                   <div className="text-[10px] text-white/90">Online</div>
                 </div>
               </div>
+              
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -270,6 +287,7 @@ export function ChatWidget({ inline = false }: ChatWidgetProps) {
               </div>
             </div>
           </motion.div>
+          </>
         )}
       </AnimatePresence>
 
